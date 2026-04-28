@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Admin Panel' ?> - Café System</title>
+    <title><?= $title ?? 'Admin Panel' ?> - Bonang Cafe</title>
     <link rel="stylesheet" href="<?= base_url('css/admin.css') ?>">
 </head>
 <body>
@@ -13,7 +13,7 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <span class="logo-icon">☕</span>
-            <span class="logo-text">CaféAdmin</span>
+            <span class="logo-text">Bonang Cafe</span>
         </div>
         <nav class="sidebar-nav">
             <p class="nav-label">Menu Utama</p>
