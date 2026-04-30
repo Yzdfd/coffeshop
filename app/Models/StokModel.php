@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 
 class StokModel extends Model
 {
-    protected $table      = 'inventory';
+    protected $table      = 'ingredients';
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
@@ -19,7 +19,7 @@ class StokModel extends Model
 
     public function getStokRendah(): array
     {
-        return $this->db->table('inventory')
+        return $this->db->table('ingredients')
             ->where('stock <=', $this->db->protectIdentifiers('min_stock'), false)
             ->get()
             ->getResultArray();
