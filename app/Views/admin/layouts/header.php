@@ -50,9 +50,7 @@
         <div class="topbar">
             <h1 class="page-title"><?= $title ?? 'Dashboard' ?></h1>
             <div class="topbar-right">
-                <span class="admin-badge">👤 <?= esc(session("name") ?? "Admin") ?></span>
-                <span style="font-size:.75rem;background:#6F4E37;color:#fff;padding:.2rem .6rem;border-radius:12px;font-weight:600;"><?= esc(ucfirst(session("role") ?? "admin")) ?></span>
-                <a href="<?= base_url("logout") ?>" style="margin-left:.5rem;text-decoration:none;font-size:1.1rem;" title="Logout">🚪</a>
+                <span class="admin-badge">👤 Admin</span>
             </div>
         </div>
         <div class="content-area">
