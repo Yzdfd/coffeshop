@@ -12,6 +12,8 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
+use App\Filters\AuthFilter;
+use App\Filters\RoleFilter;
 
 class Filters extends BaseFilters
 {
@@ -34,6 +36,9 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        // ─── Custom Auth Filters ───────────────────────────────
+        'auth'          => AuthFilter::class,  // Cek sudah login atau belum
+        'role'          => RoleFilter::class,  // Cek role yang diizinkan
     ];
 
     /**
