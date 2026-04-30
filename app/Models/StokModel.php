@@ -6,22 +6,21 @@ use CodeIgniter\Model;
 
 class StokModel extends Model
 {
-    protected $table      = 'stok_bahan';
+    protected $table      = 'inventory';
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'nama_bahan', 'satuan', 'stok', 'min_stok', 'harga_satuan', 'keterangan',
+        'supplier_id', 'name', 'unit', 'stock', 'min_stock', 'price', 'notes',
     ];
 
     protected $useTimestamps = true;
+    protected $createdField  = '';
+    protected $updatedField  = 'updated_at';
 
-    /**
-     * Ambil semua bahan yang stoknya <= min_stok (termasuk habis).
-     */
     public function getStokRendah(): array
     {
-        return $this->db->table('stok_bahan')
-            ->where('stok <=', $this->db->protectIdentifiers('min_stok'), false)
+        return $this->db->table('inventory')
+            ->where('stock <=', $this->db->protectIdentifiers('min_stock'), false)
             ->get()
             ->getResultArray();
     }

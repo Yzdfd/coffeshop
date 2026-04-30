@@ -3,10 +3,12 @@
 <?php if (session()->getFlashdata('success')): ?>
     <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
 <?php endif; ?>
+<?php if (session()->getFlashdata('error')): ?>
+    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+<?php endif; ?>
 
 <div style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start">
 
-    <!-- Tabel Kategori -->
     <div class="card">
         <div class="card-title">Daftar Kategori</div>
         <div class="table-wrap">
@@ -16,19 +18,21 @@
                         <th>#</th>
                         <th>Nama Kategori</th>
                         <th>Deskripsi</th>
+                        <th>Urutan</th>
                         <th>Jumlah Menu</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($kategoris)): ?>
-                    <tr><td colspan="5" style="text-align:center;color:#aaa;padding:30px">Belum ada kategori.</td></tr>
+                    <tr><td colspan="6" style="text-align:center;color:#aaa;padding:30px">Belum ada kategori.</td></tr>
                     <?php else: ?>
                     <?php $no = 1; foreach ($kategoris as $k): ?>
                     <tr>
                         <td><?= $no++ ?></td>
-                        <td><strong><?= esc($k['nama_kategori']) ?></strong></td>
-                        <td><?= esc($k['deskripsi'] ?? '—') ?></td>
+                        <td><strong><?= esc($k['name']) ?></strong></td>
+                        <td><?= esc($k['description'] ?? '—') ?></td>
+                        <td><?= $k['sort_order'] ?? 0 ?></td>
                         <td><span class="badge badge-info"><?= $k['jumlah_menu'] ?? 0 ?> menu</span></td>
                         <td>
                             <div class="btn-group">
@@ -50,23 +54,27 @@
         </div>
     </div>
 
-    <!-- Form Tambah/Edit -->
     <div class="card">
         <div class="card-title"><?= isset($editKategori) ? '✏️ Edit Kategori' : '➕ Tambah Kategori' ?></div>
         <form action="<?= $formAction ?>" method="post">
             <?= csrf_field() ?>
             <div class="form-group" style="margin-bottom:12px">
                 <label>Nama Kategori <span style="color:red">*</span></label>
-                <input type="text" name="nama_kategori"
-                       value="<?= old('nama_kategori', $editKategori['nama_kategori'] ?? '') ?>"
+                <input type="text" name="name"
+                       value="<?= old('name', $editKategori['name'] ?? '') ?>"
                        placeholder="Contoh: Minuman Panas" required>
-                <?php if (isset($errors['nama_kategori'])): ?>
-                    <small style="color:red"><?= $errors['nama_kategori'] ?></small>
+                <?php if (isset($errors['name'])): ?>
+                    <small style="color:red"><?= $errors['name'] ?></small>
                 <?php endif; ?>
             </div>
-            <div class="form-group" style="margin-bottom:16px">
+            <div class="form-group" style="margin-bottom:12px">
                 <label>Deskripsi</label>
-                <textarea name="deskripsi" placeholder="Deskripsi singkat (opsional)"><?= old('deskripsi', $editKategori['deskripsi'] ?? '') ?></textarea>
+                <textarea name="description" placeholder="Deskripsi singkat (opsional)"><?= old('description', $editKategori['description'] ?? '') ?></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+                <label>Urutan Tampil</label>
+                <input type="number" name="sort_order" min="0"
+                       value="<?= old('sort_order', $editKategori['sort_order'] ?? 0) ?>">
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn btn-primary">💾 Simpan</button>

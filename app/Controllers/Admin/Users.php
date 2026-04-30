@@ -14,18 +14,17 @@ class Users extends BaseController
         $this->userModel = new UserModel();
     }
 
-    // ─── INDEX ───────────────────────────────────────────────────────────────
     public function index()
     {
         $search     = $this->request->getGet('search');
         $filterRole = $this->request->getGet('role');
 
-        $builder = $this->userModel->builder();
-        $builder->select('id, nama_lengkap, username, role, status, created_at');
+        $builder = $this->userModel->db->table('users');
+        $builder->select('id, name, username, role, shift, status, created_at');
 
         if ($search) {
             $builder->groupStart()
-                ->like('nama_lengkap', $search)
+                ->like('name', $search)
                 ->orLike('username', $search)
                 ->groupEnd();
         }
@@ -43,7 +42,6 @@ class Users extends BaseController
         return view('admin/users/index', $data);
     }
 
-    // ─── CREATE ──────────────────────────────────────────────────────────────
     public function create()
     {
         $data = [
@@ -59,7 +57,7 @@ class Users extends BaseController
     public function store()
     {
         $rules = [
-            'nama_lengkap'    => 'required|min_length[2]|max_length[100]',
+            'name'            => 'required|min_length[2]|max_length[100]',
             'username'        => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
             'role'            => 'required|in_list[admin,waiter,kasir,dapur,owner]',
             'password'        => 'required|min_length[6]',
@@ -72,18 +70,18 @@ class Users extends BaseController
         }
 
         $this->userModel->insert([
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
-            'username'     => $this->request->getPost('username'),
-            'role'         => $this->request->getPost('role'),
-            'status'       => $this->request->getPost('status') ?? 'aktif',
-            'password'     => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
+            'name'          => $this->request->getPost('name'),
+            'username'      => $this->request->getPost('username'),
+            'role'          => $this->request->getPost('role'),
+            'shift'         => $this->request->getPost('shift'),
+            'status'        => $this->request->getPost('status') ?? 'active',
+            'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
         ]);
 
         return redirect()->to(base_url('admin/users'))
             ->with('success', 'User berhasil ditambahkan.');
     }
 
-    // ─── EDIT ────────────────────────────────────────────────────────────────
     public function edit($id)
     {
         $user = $this->userModel->find($id);
@@ -103,15 +101,10 @@ class Users extends BaseController
 
     public function update($id)
     {
-        $user = $this->userModel->find($id);
-        if (! $user) {
-            return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
-        }
-
         $rules = [
-            'nama_lengkap' => 'required|min_length[2]|max_length[100]',
-            'username'     => "required|min_length[3]|max_length[50]|is_unique[users.username,id,{$id}]",
-            'role'         => 'required|in_list[admin,waiter,kasir,dapur,owner]',
+            'name'     => 'required|min_length[2]|max_length[100]',
+            'username' => "required|min_length[3]|max_length[50]|is_unique[users.username,id,{$id}]",
+            'role'     => 'required|in_list[admin,waiter,kasir,dapur,owner]',
         ];
 
         if (! $this->validate($rules)) {
@@ -120,17 +113,17 @@ class Users extends BaseController
         }
 
         $this->userModel->update($id, [
-            'nama_lengkap' => $this->request->getPost('nama_lengkap'),
-            'username'     => $this->request->getPost('username'),
-            'role'         => $this->request->getPost('role'),
-            'status'       => $this->request->getPost('status'),
+            'name'     => $this->request->getPost('name'),
+            'username' => $this->request->getPost('username'),
+            'role'     => $this->request->getPost('role'),
+            'shift'    => $this->request->getPost('shift'),
+            'status'   => $this->request->getPost('status'),
         ]);
 
         return redirect()->to(base_url('admin/users'))
             ->with('success', 'User berhasil diperbarui.');
     }
 
-    // ─── RESET PASSWORD ──────────────────────────────────────────────────────
     public function resetPassword($id)
     {
         $user = $this->userModel->find($id);
@@ -138,28 +131,20 @@ class Users extends BaseController
             return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        // Reset ke password default: "password123"
         $defaultPassword = 'password123';
         $this->userModel->update($id, [
-            'password' => password_hash($defaultPassword, PASSWORD_DEFAULT),
+            'password_hash' => password_hash($defaultPassword, PASSWORD_DEFAULT),
         ]);
 
         return redirect()->to(base_url('admin/users'))
             ->with('success', 'Password user "' . $user['username'] . '" direset ke: ' . $defaultPassword);
     }
 
-    // ─── DELETE ─────────────────────────────────────────────────────────────
     public function delete($id)
     {
-        // Tidak boleh hapus diri sendiri
         if ($id == session('user_id')) {
             return redirect()->to(base_url('admin/users'))
                 ->with('error', 'Anda tidak bisa menghapus akun sendiri.');
-        }
-
-        $user = $this->userModel->find($id);
-        if (! $user) {
-            return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
         $this->userModel->delete($id);

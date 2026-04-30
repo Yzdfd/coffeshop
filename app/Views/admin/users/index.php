@@ -31,9 +31,10 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Nama Lengkap</th>
+                    <th>Nama</th>
                     <th>Username</th>
                     <th>Role</th>
+                    <th>Shift</th>
                     <th>Status</th>
                     <th>Dibuat</th>
                     <th>Aksi</th>
@@ -41,12 +42,12 @@
             </thead>
             <tbody>
                 <?php if (empty($users)): ?>
-                <tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Tidak ada user.</td></tr>
+                <tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Tidak ada user.</td></tr>
                 <?php else: ?>
                 <?php $no = 1; foreach ($users as $u): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td><?= esc($u['nama_lengkap']) ?></td>
+                    <td><?= esc($u['name']) ?></td>
                     <td><?= esc($u['username']) ?></td>
                     <td>
                         <?php
@@ -61,8 +62,9 @@
                         ?>
                         <span class="badge <?= $cls ?>"><?= ucfirst($u['role']) ?></span>
                     </td>
+                    <td><?= esc($u['shift'] ?? '—') ?></td>
                     <td>
-                        <?php if ($u['status'] == 'aktif'): ?>
+                        <?php if ($u['status'] == 'active'): ?>
                             <span class="badge badge-success">Aktif</span>
                         <?php else: ?>
                             <span class="badge badge-danger">Nonaktif</span>

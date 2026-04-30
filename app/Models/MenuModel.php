@@ -10,19 +10,17 @@ class MenuModel extends Model
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'nama_menu', 'kategori_id', 'harga', 'varian',
-        'deskripsi', 'status', 'gambar',
+        'category_id', 'name', 'description', 'price', 'hpp', 'status',
     ];
 
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = '';
 
-    /**
-     * Ambil semua menu beserta nama kategori-nya.
-     */
     public function getMenuWithKategori()
     {
         return $this->db->table('menus m')
-            ->select('m.*, k.nama_kategori')
-            ->join('kategoris k', 'k.id = m.kategori_id', 'left');
+            ->select('m.*, c.name as nama_kategori')
+            ->join('categories c', 'c.id = m.category_id', 'left');
     }
 }

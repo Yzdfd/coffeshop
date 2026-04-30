@@ -17,33 +17,31 @@ class Menu extends BaseController
         $this->kategoriModel = new KategoriModel();
     }
 
-    // ─── INDEX ──────────────────────────────────────────────────────────────
     public function index()
     {
-        $search       = $this->request->getGet('search');
-        $filterKategori = $this->request->getGet('kategori_id');
+        $search         = $this->request->getGet('search');
+        $filterKategori = $this->request->getGet('category_id');
 
         $builder = $this->menuModel->getMenuWithKategori();
 
         if ($search) {
-            $builder->like('m.nama_menu', $search);
+            $builder->like('m.name', $search);
         }
         if ($filterKategori) {
-            $builder->where('m.kategori_id', $filterKategori);
+            $builder->where('m.category_id', $filterKategori);
         }
 
         $data = [
-            'title'         => 'Manajemen Menu',
-            'menus'         => $builder->get()->getResultArray(),
-            'kategoris'     => $this->kategoriModel->findAll(),
-            'search'        => $search,
-            'filterKategori'=> $filterKategori,
+            'title'          => 'Manajemen Menu',
+            'menus'          => $builder->get()->getResultArray(),
+            'kategoris'      => $this->kategoriModel->findAll(),
+            'search'         => $search,
+            'filterKategori' => $filterKategori,
         ];
 
         return view('admin/menu/index', $data);
     }
 
-    // ─── CREATE ─────────────────────────────────────────────────────────────
     public function create()
     {
         $data = [
@@ -60,10 +58,9 @@ class Menu extends BaseController
     public function store()
     {
         $rules = [
-            'nama_menu'   => 'required|min_length[2]|max_length[100]',
-            'kategori_id' => 'required|is_not_unique[kategoris.id]',
-            'harga'       => 'required|numeric|greater_than_equal_to[0]',
-            'gambar'      => 'is_image[gambar]|max_size[gambar,2048]',
+            'name'        => 'required|min_length[2]|max_length[100]',
+            'category_id' => 'required',
+            'price'       => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -71,28 +68,19 @@ class Menu extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        $gambar = $this->request->getFile('gambar');
-        $namaGambar = null;
-        if ($gambar && $gambar->isValid() && ! $gambar->hasMoved()) {
-            $namaGambar = $gambar->getRandomName();
-            $gambar->move(ROOTPATH . 'public/uploads/menu', $namaGambar);
-        }
-
         $this->menuModel->insert([
-            'nama_menu'   => $this->request->getPost('nama_menu'),
-            'kategori_id' => $this->request->getPost('kategori_id'),
-            'harga'       => $this->request->getPost('harga'),
-            'varian'      => $this->request->getPost('varian'),
-            'deskripsi'   => $this->request->getPost('deskripsi'),
-            'status'      => $this->request->getPost('status') ?? 'tersedia',
-            'gambar'      => $namaGambar,
+            'name'        => $this->request->getPost('name'),
+            'category_id' => $this->request->getPost('category_id'),
+            'price'       => $this->request->getPost('price'),
+            'hpp'         => $this->request->getPost('hpp') ?? 0,
+            'description' => $this->request->getPost('description'),
+            'status'      => $this->request->getPost('status') ?? 'available',
         ]);
 
         return redirect()->to(base_url('admin/menu'))
             ->with('success', 'Menu berhasil ditambahkan.');
     }
 
-    // ─── EDIT ────────────────────────────────────────────────────────────────
     public function edit($id)
     {
         $menu = $this->menuModel->find($id);
@@ -119,10 +107,9 @@ class Menu extends BaseController
         }
 
         $rules = [
-            'nama_menu'   => 'required|min_length[2]|max_length[100]',
-            'kategori_id' => 'required|is_not_unique[kategoris.id]',
-            'harga'       => 'required|numeric|greater_than_equal_to[0]',
-            'gambar'      => 'is_image[gambar]|max_size[gambar,2048]',
+            'name'        => 'required|min_length[2]|max_length[100]',
+            'category_id' => 'required',
+            'price'       => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -130,42 +117,24 @@ class Menu extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        $gambar = $this->request->getFile('gambar');
-        $namaGambar = $menu['gambar'];
-
-        if ($gambar && $gambar->isValid() && ! $gambar->hasMoved()) {
-            // Hapus gambar lama
-            if ($namaGambar && file_exists(ROOTPATH . 'public/uploads/menu/' . $namaGambar)) {
-                unlink(ROOTPATH . 'public/uploads/menu/' . $namaGambar);
-            }
-            $namaGambar = $gambar->getRandomName();
-            $gambar->move(ROOTPATH . 'public/uploads/menu', $namaGambar);
-        }
-
         $this->menuModel->update($id, [
-            'nama_menu'   => $this->request->getPost('nama_menu'),
-            'kategori_id' => $this->request->getPost('kategori_id'),
-            'harga'       => $this->request->getPost('harga'),
-            'varian'      => $this->request->getPost('varian'),
-            'deskripsi'   => $this->request->getPost('deskripsi'),
+            'name'        => $this->request->getPost('name'),
+            'category_id' => $this->request->getPost('category_id'),
+            'price'       => $this->request->getPost('price'),
+            'hpp'         => $this->request->getPost('hpp') ?? 0,
+            'description' => $this->request->getPost('description'),
             'status'      => $this->request->getPost('status'),
-            'gambar'      => $namaGambar,
         ]);
 
         return redirect()->to(base_url('admin/menu'))
             ->with('success', 'Menu berhasil diperbarui.');
     }
 
-    // ─── DELETE ─────────────────────────────────────────────────────────────
     public function delete($id)
     {
         $menu = $this->menuModel->find($id);
         if (! $menu) {
             return redirect()->to(base_url('admin/menu'))->with('error', 'Menu tidak ditemukan.');
-        }
-
-        if ($menu['gambar'] && file_exists(ROOTPATH . 'public/uploads/menu/' . $menu['gambar'])) {
-            unlink(ROOTPATH . 'public/uploads/menu/' . $menu['gambar']);
         }
 
         $this->menuModel->delete($id);

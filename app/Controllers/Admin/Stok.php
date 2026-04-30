@@ -14,27 +14,26 @@ class Stok extends BaseController
         $this->stokModel = new StokModel();
     }
 
-    // ─── INDEX ───────────────────────────────────────────────────────────────
     public function index()
     {
         $search = $this->request->getGet('search');
         $filter = $this->request->getGet('filter');
 
-        $builder = $this->stokModel->builder('stok_bahan');
+        $builder = $this->stokModel->db->table('inventory');
 
         if ($search) {
-            $builder->like('nama_bahan', $search);
+            $builder->like('name', $search);
         }
         if ($filter === 'ok') {
-            $builder->where('stok > min_stok');
+            $builder->where('stock > min_stock');
         } elseif ($filter === 'low') {
-            $builder->where('stok > 0')->where('stok <=', 'min_stok', false);
+            $builder->where('stock > 0')->where('stock <= min_stock');
         } elseif ($filter === 'empty') {
-            $builder->where('stok', 0);
+            $builder->where('stock', 0);
         }
 
         $data = [
-            'title'  => 'Kelola Stok Bahan',
+            'title'  => 'Kelola Stok Bahan (Inventory)',
             'stoks'  => $builder->get()->getResultArray(),
             'search' => $search,
             'filter' => $filter,
@@ -43,7 +42,6 @@ class Stok extends BaseController
         return view('admin/stok/index', $data);
     }
 
-    // ─── CREATE ──────────────────────────────────────────────────────────────
     public function create()
     {
         $data = [
@@ -59,9 +57,9 @@ class Stok extends BaseController
     public function store()
     {
         $rules = [
-            'nama_bahan' => 'required|min_length[2]|max_length[100]',
-            'satuan'     => 'required',
-            'stok'       => 'required|numeric|greater_than_equal_to[0]',
+            'name'  => 'required|min_length[2]|max_length[100]',
+            'unit'  => 'required',
+            'stock' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -70,19 +68,18 @@ class Stok extends BaseController
         }
 
         $this->stokModel->insert([
-            'nama_bahan'   => $this->request->getPost('nama_bahan'),
-            'satuan'       => $this->request->getPost('satuan'),
-            'stok'         => $this->request->getPost('stok'),
-            'min_stok'     => $this->request->getPost('min_stok') ?? 5,
-            'harga_satuan' => $this->request->getPost('harga_satuan') ?? 0,
-            'keterangan'   => $this->request->getPost('keterangan'),
+            'name'      => $this->request->getPost('name'),
+            'unit'      => $this->request->getPost('unit'),
+            'stock'     => $this->request->getPost('stock'),
+            'min_stock' => $this->request->getPost('min_stock') ?? 5,
+            'price'     => $this->request->getPost('price') ?? 0,
+            'notes'     => $this->request->getPost('notes'),
         ]);
 
         return redirect()->to(base_url('admin/stok'))
             ->with('success', 'Bahan berhasil ditambahkan.');
     }
 
-    // ─── EDIT ────────────────────────────────────────────────────────────────
     public function edit($id)
     {
         $stok = $this->stokModel->find($id);
@@ -108,9 +105,9 @@ class Stok extends BaseController
         }
 
         $rules = [
-            'nama_bahan' => 'required|min_length[2]|max_length[100]',
-            'satuan'     => 'required',
-            'stok'       => 'required|numeric|greater_than_equal_to[0]',
+            'name'  => 'required|min_length[2]|max_length[100]',
+            'unit'  => 'required',
+            'stock' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -119,47 +116,44 @@ class Stok extends BaseController
         }
 
         $this->stokModel->update($id, [
-            'nama_bahan'   => $this->request->getPost('nama_bahan'),
-            'satuan'       => $this->request->getPost('satuan'),
-            'stok'         => $this->request->getPost('stok'),
-            'min_stok'     => $this->request->getPost('min_stok'),
-            'harga_satuan' => $this->request->getPost('harga_satuan'),
-            'keterangan'   => $this->request->getPost('keterangan'),
+            'name'      => $this->request->getPost('name'),
+            'unit'      => $this->request->getPost('unit'),
+            'stock'     => $this->request->getPost('stock'),
+            'min_stock' => $this->request->getPost('min_stock'),
+            'price'     => $this->request->getPost('price'),
+            'notes'     => $this->request->getPost('notes'),
         ]);
 
         return redirect()->to(base_url('admin/stok'))
             ->with('success', 'Data bahan berhasil diperbarui.');
     }
 
-    // ─── TAMBAH STOK ─────────────────────────────────────────────────────────
     public function tambah($id)
     {
-    $stok = $this->stokModel->find($id);
-    if (! $stok) {
-        return redirect()->to(base_url('admin/stok'))->with('error', 'Data tidak ditemukan.');
-    }
-
-    if ($this->request->getMethod() === 'post') {
-        $jumlah = (int) $this->request->getPost('jumlah');
-        if ($jumlah <= 0) {
-            return redirect()->back()->with('error', 'Jumlah harus lebih dari 0.');
+        $stok = $this->stokModel->find($id);
+        if (! $stok) {
+            return redirect()->to(base_url('admin/stok'))->with('error', 'Data tidak ditemukan.');
         }
 
-        $stokBaru = (int)$stok['stok'] + $jumlah;
+        if ($this->request->getMethod() === 'post') {
+            $jumlah = (float) $this->request->getPost('jumlah');
+            if ($jumlah <= 0) {
+                return redirect()->back()->with('error', 'Jumlah harus lebih dari 0.');
+            }
 
-        $this->stokModel->update($id, ['stok' => $stokBaru]);
+            $stokBaru = (float)$stok['stock'] + $jumlah;
+            $this->stokModel->update($id, ['stock' => $stokBaru]);
 
-        return redirect()->to(base_url('admin/stok'))
-            ->with('success', 'Stok berhasil ditambahkan sebanyak ' . $jumlah . '.');
+            return redirect()->to(base_url('admin/stok'))
+                ->with('success', 'Stok berhasil ditambahkan sebanyak ' . $jumlah . ' ' . $stok['unit'] . '.');
+        }
+
+        return view('admin/stok/tambah', [
+            'title' => 'Tambah Stok: ' . $stok['name'],
+            'stok'  => $stok,
+        ]);
     }
 
-    return view('admin/stok/tambah', [
-        'title' => 'Tambah Stok: ' . $stok['nama_bahan'],
-        'stok'  => $stok,
-    ]);
-    }
-
-    // ─── DELETE ─────────────────────────────────────────────────────────────
     public function delete($id)
     {
         $stok = $this->stokModel->find($id);

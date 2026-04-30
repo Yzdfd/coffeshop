@@ -7,10 +7,10 @@
 
             <div class="form-group">
                 <label>Nama Lengkap <span style="color:red">*</span></label>
-                <input type="text" name="nama_lengkap"
-                       value="<?= old('nama_lengkap', $user['nama_lengkap'] ?? '') ?>" required>
-                <?php if (isset($errors['nama_lengkap'])): ?>
-                    <small style="color:red"><?= $errors['nama_lengkap'] ?></small>
+                <input type="text" name="name"
+                       value="<?= old('name', $user['name'] ?? '') ?>" required>
+                <?php if (isset($errors['name'])): ?>
+                    <small style="color:red"><?= $errors['name'] ?></small>
                 <?php endif; ?>
             </div>
 
@@ -36,14 +36,26 @@
             </div>
 
             <div class="form-group">
-                <label>Status</label>
-                <select name="status">
-                    <option value="aktif"    <?= old('status', $user['status'] ?? 'aktif') == 'aktif'    ? 'selected' : '' ?>>Aktif</option>
-                    <option value="nonaktif" <?= old('status', $user['status'] ?? '') == 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
+                <label>Shift</label>
+                <select name="shift">
+                    <option value="">-- Pilih Shift --</option>
+                    <?php foreach (['Pagi','Siang','Malam'] as $sh): ?>
+                        <option value="<?= $sh ?>" <?= old('shift', $user['shift'] ?? '') == $sh ? 'selected' : '' ?>>
+                            <?= $sh ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
 
-            <?php if (!isset($user)): // hanya saat create ?>
+            <div class="form-group">
+                <label>Status</label>
+                <select name="status">
+                    <option value="active"   <?= old('status', $user['status'] ?? 'active') == 'active'   ? 'selected' : '' ?>>Aktif</option>
+                    <option value="inactive" <?= old('status', $user['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Nonaktif</option>
+                </select>
+            </div>
+
+            <?php if (! isset($user)): ?>
             <div class="form-group">
                 <label>Password <span style="color:red">*</span></label>
                 <input type="password" name="password" required>

@@ -10,10 +10,12 @@ class UserModel extends Model
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'nama_lengkap', 'username', 'password', 'role', 'status',
+        'name', 'username', 'password_hash', 'role', 'shift', 'status',
     ];
 
     protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = '';
 
-    protected $hidden = ['password'];
+    protected $hidden = ['password_hash'];
 }

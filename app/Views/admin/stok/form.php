@@ -7,19 +7,19 @@
 
             <div class="form-group">
                 <label>Nama Bahan <span style="color:red">*</span></label>
-                <input type="text" name="nama_bahan"
-                       value="<?= old('nama_bahan', $stok['nama_bahan'] ?? '') ?>" required>
-                <?php if (isset($errors['nama_bahan'])): ?>
-                    <small style="color:red"><?= $errors['nama_bahan'] ?></small>
+                <input type="text" name="name"
+                       value="<?= old('name', $stok['name'] ?? '') ?>" required>
+                <?php if (isset($errors['name'])): ?>
+                    <small style="color:red"><?= $errors['name'] ?></small>
                 <?php endif; ?>
             </div>
 
             <div class="form-group">
                 <label>Satuan <span style="color:red">*</span></label>
-                <select name="satuan" required>
+                <select name="unit" required>
                     <option value="">-- Pilih Satuan --</option>
-                    <?php foreach (['gram','kg','ml','liter','pcs','botol','sachet','sdm','sdm','bungkus'] as $sat): ?>
-                        <option value="<?= $sat ?>" <?= old('satuan', $stok['satuan'] ?? '') == $sat ? 'selected' : '' ?>>
+                    <?php foreach (['gram','kg','ml','liter','pcs','botol','sachet','sdm','bungkus'] as $sat): ?>
+                        <option value="<?= $sat ?>" <?= old('unit', $stok['unit'] ?? '') == $sat ? 'selected' : '' ?>>
                             <?= $sat ?>
                         </option>
                     <?php endforeach; ?>
@@ -27,26 +27,26 @@
             </div>
 
             <div class="form-group">
-                <label>Stok Awal <span style="color:red">*</span></label>
-                <input type="number" name="stok"
-                       value="<?= old('stok', $stok['stok'] ?? 0) ?>" min="0" required>
+                <label>Stok <span style="color:red">*</span></label>
+                <input type="number" name="stock" step="0.01"
+                       value="<?= old('stock', $stok['stock'] ?? 0) ?>" min="0" required>
             </div>
 
             <div class="form-group">
                 <label>Minimum Stok (Notifikasi)</label>
-                <input type="number" name="min_stok"
-                       value="<?= old('min_stok', $stok['min_stok'] ?? 5) ?>" min="0">
+                <input type="number" name="min_stock" step="0.01"
+                       value="<?= old('min_stock', $stok['min_stock'] ?? 5) ?>" min="0">
             </div>
 
             <div class="form-group">
                 <label>Harga Satuan (Rp)</label>
-                <input type="number" name="harga_satuan"
-                       value="<?= old('harga_satuan', $stok['harga_satuan'] ?? 0) ?>" min="0">
+                <input type="number" name="price"
+                       value="<?= old('price', $stok['price'] ?? 0) ?>" min="0">
             </div>
 
             <div class="form-group full">
-                <label>Keterangan</label>
-                <textarea name="keterangan"><?= old('keterangan', $stok['keterangan'] ?? '') ?></textarea>
+                <label>Catatan</label>
+                <textarea name="notes"><?= old('notes', $stok['notes'] ?? '') ?></textarea>
             </div>
 
         </div>

@@ -42,7 +42,7 @@ app.baseURL = 'http://localhost:8080/'
 
 # If you use MySQLi as tests, first update the values of Config\Database::$tests.
 database.default.hostname = localhost
-database.default.database = cafes
+database.default.database = caffeshop
 database.default.username = root
 database.default.password =
 database.default.DBDriver = MySQLi

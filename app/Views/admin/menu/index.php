@@ -14,11 +14,11 @@
             <form method="get">
                 <div style="display:flex;gap:8px">
                     <input type="text" name="search" value="<?= esc($search ?? '') ?>" placeholder="Cari nama menu...">
-                    <select name="kategori_id">
+                    <select name="category_id">
                         <option value="">Semua Kategori</option>
                         <?php foreach ($kategoris as $k): ?>
                             <option value="<?= $k['id'] ?>" <?= ($filterKategori ?? '') == $k['id'] ? 'selected' : '' ?>>
-                                <?= esc($k['nama_kategori']) ?>
+                                <?= esc($k['name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -33,35 +33,27 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Gambar</th>
                     <th>Nama Menu</th>
                     <th>Kategori</th>
-                    <th>Harga</th>
-                    <th>Varian</th>
+                    <th>Harga Jual</th>
+                    <th>HPP</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($menus)): ?>
-                <tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Tidak ada data menu.</td></tr>
+                <tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">Tidak ada data menu.</td></tr>
                 <?php else: ?>
                 <?php $no = 1; foreach ($menus as $m): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td>
-                        <?php if (!empty($m['gambar'])): ?>
-                            <img src="<?= base_url('uploads/menu/' . $m['gambar']) ?>" class="img-preview">
-                        <?php else: ?>
-                            <span style="color:#ccc">—</span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= esc($m['nama_menu']) ?></td>
+                    <td><?= esc($m['name']) ?></td>
                     <td><?= esc($m['nama_kategori'] ?? '-') ?></td>
-                    <td>Rp <?= number_format($m['harga'], 0, ',', '.') ?></td>
-                    <td><?= !empty($m['varian']) ? esc($m['varian']) : '<span style="color:#ccc">—</span>' ?></td>
+                    <td>Rp <?= number_format($m['price'], 0, ',', '.') ?></td>
+                    <td>Rp <?= number_format($m['hpp'], 0, ',', '.') ?></td>
                     <td>
-                        <?php if ($m['status'] == 'tersedia'): ?>
+                        <?php if ($m['status'] == 'available'): ?>
                             <span class="badge badge-success">Tersedia</span>
                         <?php else: ?>
                             <span class="badge badge-danger">Habis</span>

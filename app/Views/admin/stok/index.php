@@ -32,36 +32,39 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Bahan</th>
-                    <th>Stok Saat Ini</th>
+                    <th>Stok</th>
                     <th>Satuan</th>
                     <th>Min. Stok</th>
                     <th>Harga Satuan</th>
+                    <th>Catatan</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($stoks)): ?>
-                <tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">Tidak ada data stok.</td></tr>
+                <tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">Tidak ada data inventory.</td></tr>
                 <?php else: ?>
                 <?php $no = 1; foreach ($stoks as $s):
-                    $status = '';
-                    $badge  = '';
-                    if ($s['stok'] <= 0) {
-                        $status = 'stok-out'; $badge = '<span class="badge badge-danger">Habis</span>';
-                    } elseif ($s['stok'] <= $s['min_stok']) {
-                        $status = 'stok-low'; $badge = '<span class="badge badge-warning">Hampir Habis</span>';
+                    if ($s['stock'] <= 0) {
+                        $statusClass = 'stok-out';
+                        $badge = '<span class="badge badge-danger">Habis</span>';
+                    } elseif ($s['stock'] <= $s['min_stock']) {
+                        $statusClass = 'stok-low';
+                        $badge = '<span class="badge badge-warning">Hampir Habis</span>';
                     } else {
-                        $status = 'stok-ok'; $badge = '<span class="badge badge-success">Aman</span>';
+                        $statusClass = 'stok-ok';
+                        $badge = '<span class="badge badge-success">Aman</span>';
                     }
                 ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td><?= esc($s['nama_bahan']) ?></td>
-                    <td class="<?= $status ?>"><strong><?= $s['stok'] ?></strong></td>
-                    <td><?= esc($s['satuan']) ?></td>
-                    <td><?= $s['min_stok'] ?></td>
-                    <td>Rp <?= number_format($s['harga_satuan'] ?? 0, 0, ',', '.') ?></td>
+                    <td><?= esc($s['name']) ?></td>
+                    <td class="<?= $statusClass ?>"><strong><?= $s['stock'] ?></strong></td>
+                    <td><?= esc($s['unit']) ?></td>
+                    <td><?= $s['min_stock'] ?></td>
+                    <td>Rp <?= number_format($s['price'] ?? 0, 0, ',', '.') ?></td>
+                    <td><?= esc($s['notes'] ?? '—') ?></td>
                     <td><?= $badge ?></td>
                     <td>
                         <div class="btn-group">

@@ -14,7 +14,6 @@ class Kategori extends BaseController
         $this->kategoriModel = new KategoriModel();
     }
 
-    // ─── INDEX + FORM TAMBAH ─────────────────────────────────────────────────
     public function index()
     {
         $data = [
@@ -30,7 +29,7 @@ class Kategori extends BaseController
     public function store()
     {
         $rules = [
-            'nama_kategori' => 'required|min_length[2]|max_length[80]|is_unique[kategoris.nama_kategori]',
+            'name' => 'required|min_length[2]|max_length[100]|is_unique[categories.name]',
         ];
 
         if (! $this->validate($rules)) {
@@ -39,15 +38,15 @@ class Kategori extends BaseController
         }
 
         $this->kategoriModel->insert([
-            'nama_kategori' => $this->request->getPost('nama_kategori'),
-            'deskripsi'     => $this->request->getPost('deskripsi'),
+            'name'        => $this->request->getPost('name'),
+            'description' => $this->request->getPost('description'),
+            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))
             ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    // ─── EDIT ────────────────────────────────────────────────────────────────
     public function edit($id)
     {
         $kategori = $this->kategoriModel->find($id);
@@ -68,13 +67,8 @@ class Kategori extends BaseController
 
     public function update($id)
     {
-        $kategori = $this->kategoriModel->find($id);
-        if (! $kategori) {
-            return redirect()->to(base_url('admin/kategori'))->with('error', 'Kategori tidak ditemukan.');
-        }
-
         $rules = [
-            'nama_kategori' => "required|min_length[2]|max_length[80]|is_unique[kategoris.nama_kategori,id,{$id}]",
+            'name' => "required|min_length[2]|max_length[100]|is_unique[categories.name,id,{$id}]",
         ];
 
         if (! $this->validate($rules)) {
@@ -83,23 +77,17 @@ class Kategori extends BaseController
         }
 
         $this->kategoriModel->update($id, [
-            'nama_kategori' => $this->request->getPost('nama_kategori'),
-            'deskripsi'     => $this->request->getPost('deskripsi'),
+            'name'        => $this->request->getPost('name'),
+            'description' => $this->request->getPost('description'),
+            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))
             ->with('success', 'Kategori berhasil diperbarui.');
     }
 
-    // ─── DELETE ─────────────────────────────────────────────────────────────
     public function delete($id)
     {
-        $kategori = $this->kategoriModel->find($id);
-        if (! $kategori) {
-            return redirect()->to(base_url('admin/kategori'))->with('error', 'Kategori tidak ditemukan.');
-        }
-
-        // Cek apakah ada menu yang menggunakan kategori ini
         $jumlah = $this->kategoriModel->countMenuByKategori($id);
         if ($jumlah > 0) {
             return redirect()->to(base_url('admin/kategori'))

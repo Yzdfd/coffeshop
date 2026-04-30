@@ -5,67 +5,53 @@
 <?php endif; ?>
 
 <div class="card">
-    <form action="<?= $formAction ?>" method="post" enctype="multipart/form-data">
+    <form action="<?= $formAction ?>" method="post">
         <?= csrf_field() ?>
         <div class="form-grid">
 
-            <!-- Nama Menu -->
             <div class="form-group">
                 <label>Nama Menu <span style="color:red">*</span></label>
-                <input type="text" name="nama_menu" value="<?= old('nama_menu', $menu['nama_menu'] ?? '') ?>" required>
-                <?php if (isset($errors['nama_menu'])): ?>
-                    <small style="color:red"><?= $errors['nama_menu'] ?></small>
+                <input type="text" name="name" value="<?= old('name', $menu['name'] ?? '') ?>" required>
+                <?php if (isset($errors['name'])): ?>
+                    <small style="color:red"><?= $errors['name'] ?></small>
                 <?php endif; ?>
             </div>
 
-            <!-- Kategori -->
             <div class="form-group">
                 <label>Kategori <span style="color:red">*</span></label>
-                <select name="kategori_id" required>
+                <select name="category_id" required>
                     <option value="">-- Pilih Kategori --</option>
                     <?php foreach ($kategoris as $k): ?>
                         <option value="<?= $k['id'] ?>"
-                            <?= old('kategori_id', $menu['kategori_id'] ?? '') == $k['id'] ? 'selected' : '' ?>>
-                            <?= esc($k['nama_kategori']) ?>
+                            <?= old('category_id', $menu['category_id'] ?? '') == $k['id'] ? 'selected' : '' ?>>
+                            <?= esc($k['name']) ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
-            <!-- Harga -->
             <div class="form-group">
-                <label>Harga (Rp) <span style="color:red">*</span></label>
-                <input type="number" name="harga" value="<?= old('harga', $menu['harga'] ?? '') ?>" min="0" required>
+                <label>Harga Jual (Rp) <span style="color:red">*</span></label>
+                <input type="number" name="price" value="<?= old('price', $menu['price'] ?? '') ?>" min="0" required>
             </div>
 
-            <!-- Status -->
+            <div class="form-group">
+                <label>HPP - Harga Per Produk (Rp)</label>
+                <input type="number" name="hpp" value="<?= old('hpp', $menu['hpp'] ?? 0) ?>" min="0">
+                <small style="color:#888">Harga modal / biaya produksi per item</small>
+            </div>
+
             <div class="form-group">
                 <label>Status</label>
                 <select name="status">
-                    <option value="tersedia" <?= old('status', $menu['status'] ?? 'tersedia') == 'tersedia' ? 'selected' : '' ?>>Tersedia</option>
-                    <option value="habis"    <?= old('status', $menu['status'] ?? '') == 'habis' ? 'selected' : '' ?>>Habis</option>
+                    <option value="available" <?= old('status', $menu['status'] ?? 'available') == 'available' ? 'selected' : '' ?>>Tersedia</option>
+                    <option value="unavailable" <?= old('status', $menu['status'] ?? '') == 'unavailable' ? 'selected' : '' ?>>Habis</option>
                 </select>
             </div>
 
-            <!-- Varian -->
-            <div class="form-group">
-                <label>Varian / Takaran <small style="color:#aaa">(pisahkan dengan koma)</small></label>
-                <input type="text" name="varian" value="<?= old('varian', $menu['varian'] ?? '') ?>" placeholder="Kecil, Sedang, Besar">
-            </div>
-
-            <!-- Gambar -->
-            <div class="form-group">
-                <label>Gambar Menu</label>
-                <input type="file" name="gambar" accept="image/*">
-                <?php if (!empty($menu['gambar'])): ?>
-                    <small style="color:#888">Gambar saat ini: <?= esc($menu['gambar']) ?></small>
-                <?php endif; ?>
-            </div>
-
-            <!-- Deskripsi -->
             <div class="form-group full">
                 <label>Deskripsi</label>
-                <textarea name="deskripsi"><?= old('deskripsi', $menu['deskripsi'] ?? '') ?></textarea>
+                <textarea name="description"><?= old('description', $menu['description'] ?? '') ?></textarea>
             </div>
 
         </div>
