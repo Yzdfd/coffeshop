@@ -41,11 +41,11 @@
                 <?php foreach ($stokPeringatan as $s): ?>
                 <tr>
                     <td><?= esc($s['name']) ?></td>
-                    <td class="<?= $s['stock'] == 0 ? 'stok-out' : 'stok-low' ?>"><?= $s['stock'] ?></td>
+                    <td class="<?= $s['stock_qty'] == 0 ? 'stok-out' : 'stok-low' ?>"><?= $s['stock_qty'] ?></td>
                     <td><?= esc($s['unit']) ?></td>
                     <td><?= $s['min_stock'] ?></td>
                     <td>
-                        <?php if ($s['stock'] == 0): ?>
+                        <?php if ($s['stock_qty'] == 0): ?>
                             <span class="badge badge-danger">Habis</span>
                         <?php else: ?>
                             <span class="badge badge-warning">Hampir Habis</span>
