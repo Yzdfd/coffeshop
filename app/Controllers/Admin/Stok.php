@@ -19,7 +19,7 @@ class Stok extends BaseController
         $search = $this->request->getGet('search');
         $filter = $this->request->getGet('filter');
 
-        $builder = $this->stokModel->db->table('inventory');
+        $builder = $this->stokModel->db->table('ingredients');
 
         if ($search) {
             $builder->like('name', $search);
@@ -33,7 +33,7 @@ class Stok extends BaseController
         }
 
         $data = [
-            'title'  => 'Kelola Stok Bahan (Inventory)',
+            'title'  => 'Kelola Stok Bahan (ingredients)',
             'stoks'  => $builder->get()->getResultArray(),
             'search' => $search,
             'filter' => $filter,
