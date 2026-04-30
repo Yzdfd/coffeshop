@@ -13,7 +13,7 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <span class="logo-icon">☕</span>
-            <span class="logo-text">CaféAdmin</span>
+            <span class="logo-text">CafeBonang</span>
         </div>
         <nav class="sidebar-nav">
             <p class="nav-label">Menu Utama</p>
