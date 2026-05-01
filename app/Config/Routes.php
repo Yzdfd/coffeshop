@@ -54,30 +54,8 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     $routes->get('users/delete/(:num)',          'Users::delete/$1');
 
     // ─── SETTING SISTEM ──────────────────────────────────────
-    $routes->get('setting',       'Setting::index');
-    $routes->post('setting/save', 'Setting::save');
+    // URL: /admin/setting
+    // Atur nama café, pajak, service charge, jumlah meja, dll
+    $routes->get('setting',        'Setting::index'); // Halaman setting
+    $routes->post('setting/save',  'Setting::save');  // Simpan setting
 });
-
-// ─── KASIR ───────────────────────────────────────────────────────────────────
-// $routes->group('kasir', ['namespace' => 'App\Controllers\Kasir', 'filter' => 'auth:kasir,admin'], function ($routes) {
-//     $routes->get('dashboard', 'Dashboard::index');
-//     // ... tambah routes kasir di sini
-// });
-
-// ─── WAITER ──────────────────────────────────────────────────────────────────
-// $routes->group('waiter', ['namespace' => 'App\Controllers\Waiter', 'filter' => 'auth:waiter,admin'], function ($routes) {
-//     $routes->get('dashboard', 'Dashboard::index');
-//     // ... tambah routes waiter di sini
-// });
-
-// ─── DAPUR ───────────────────────────────────────────────────────────────────
-// $routes->group('dapur', ['namespace' => 'App\Controllers\Dapur', 'filter' => 'auth:dapur,admin'], function ($routes) {
-//     $routes->get('dashboard', 'Dashboard::index');
-//     // ... tambah routes dapur di sini
-// });
-
-// ─── OWNER ───────────────────────────────────────────────────────────────────
-// $routes->group('owner', ['namespace' => 'App\Controllers\Owner', 'filter' => 'auth:owner,admin'], function ($routes) {
-//     $routes->get('dashboard', 'Dashboard::index');
-//     // ... tambah routes owner di sini
-// });

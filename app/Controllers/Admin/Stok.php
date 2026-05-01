@@ -33,7 +33,7 @@ class Stok extends BaseController
         }
 
         $data = [
-            'title'  => 'Kelola Stok Bahan (ingredients)',
+            'title'  => 'Kelola Stok Bahan (Ingredients)',
             'stoks'  => $builder->get()->getResultArray(),
             'search' => $search,
             'filter' => $filter,
@@ -59,7 +59,7 @@ class Stok extends BaseController
         $rules = [
             'name'  => 'required|min_length[2]|max_length[100]',
             'unit'  => 'required',
-            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
+            'stock' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -72,8 +72,6 @@ class Stok extends BaseController
             'unit'      => $this->request->getPost('unit'),
             'stock_qty' => $this->request->getPost('stock_qty'),
             'min_stock' => $this->request->getPost('min_stock') ?? 5,
-            'price'     => $this->request->getPost('price') ?? 0,
-            'notes'     => $this->request->getPost('notes'),
         ]);
 
         return redirect()->to(base_url('admin/stok'))
@@ -107,7 +105,7 @@ class Stok extends BaseController
         $rules = [
             'name'  => 'required|min_length[2]|max_length[100]',
             'unit'  => 'required',
-            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
+            'stock' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -120,8 +118,6 @@ class Stok extends BaseController
             'unit'      => $this->request->getPost('unit'),
             'stock_qty' => $this->request->getPost('stock_qty'),
             'min_stock' => $this->request->getPost('min_stock'),
-            'price'     => $this->request->getPost('price'),
-            'notes'     => $this->request->getPost('notes'),
         ]);
 
         return redirect()->to(base_url('admin/stok'))

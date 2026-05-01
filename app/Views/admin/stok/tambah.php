@@ -6,7 +6,7 @@
         <p style="margin-bottom:4px;color:#888;font-size:12px">Bahan</p>
         <p style="font-size:16px;font-weight:600"><?= esc($stok['name']) ?></p>
         <p style="margin-top:6px;color:#888;font-size:12px">Stok saat ini</p>
-        <p style="font-size:18px;font-weight:700;color:#2e7d32"><?= $stok['stock_qty'] ?> <?= esc($stok['unit']) ?></p>
+        <p style="font-size:18px;font-weight:700;color:#2e7d32"><?= $stok['stock'] ?> <?= esc($stok['unit']) ?></p>
     </div>
 
     <?php if (session()->getFlashdata('error')): ?>

@@ -48,10 +48,10 @@
                 </tr>
                 <?php else: ?>
                 <?php $no = 1; foreach ($stoks as $s):
-                    if ($s['stock_qty'] <= 0) {
+                    if ($s['stock'] <= 0) {
                         $statusClass = 'stok-out';
                         $badge = '<span class="badge badge-danger">Habis</span>';
-                    } elseif ($s['stock_qty'] <= $s['min_stock']) {
+                    } elseif ($s['stock'] <= $s['min_stock']) {
                         $statusClass = 'stok-low';
                         $badge = '<span class="badge badge-warning">Hampir Habis</span>';
                     } else {

@@ -10,11 +10,11 @@ class StokModel extends Model
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'supplier_id', 'name', 'unit', 'stock_qty', 'min_stock', 'price', 'notes',
+        'supplier_id', 'name', 'unit', 'stock', 'min_stock', 'price', 'notes',
     ];
 
     protected $useTimestamps = true;
-    protected $createdField  = '';
+    protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
     public function getStokRendah(): array

@@ -26,6 +26,10 @@ class Setting extends BaseController
 
     public function save()
     {
+
+// Tambah sementara untuk debug
+    log_message('debug', 'POST data: ' . json_encode($this->request->getPost()));
+
         $fields = [
             'nama_cafe',
             'telepon',

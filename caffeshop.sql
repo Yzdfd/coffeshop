@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2026 at 01:36 PM
+-- Generation Time: Apr 30, 2026 at 07:35 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,8 +69,17 @@ CREATE TABLE `ingredients` (
   `stock_qty` decimal(10,2) DEFAULT NULL,
   `min_stock` decimal(10,2) DEFAULT NULL,
   `unit` varchar(50) DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `ingredients`
+--
+
+INSERT INTO `ingredients` (`id`, `supplier_id`, `name`, `stock_qty`, `min_stock`, `unit`, `updated_at`, `created_at`) VALUES
+(1, NULL, 'biji kopi', 1.00, 5.00, 'kg', '2026-04-30 10:30:14', '2026-04-30 10:30:14'),
+(2, NULL, 'gula', 20.00, 5.00, 'kg', '2026-04-30 10:32:19', '2026-04-30 10:32:07');
 
 -- --------------------------------------------------------
 
@@ -94,7 +103,7 @@ CREATE TABLE `menus` (
 --
 
 INSERT INTO `menus` (`id`, `category_id`, `name`, `description`, `price`, `hpp`, `status`, `created_at`) VALUES
-(1, 1, 'Kopi Liong', 'beli diwarung\r\n', 10000.00, 10000.00, 'available', '2026-04-30 04:33:57');
+(1, 1, 'Kopi Liong', '', 10000.00, 1000.00, 'available', '2026-04-30 10:32:45');
 
 -- --------------------------------------------------------
 
@@ -189,7 +198,7 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`id`, `key`, `value`) VALUES
-(1, 'nama_cafe', 'bonang'),
+(1, 'nama_cafe', 'Cafe Bonang'),
 (2, 'telepon', ''),
 (3, 'alamat', ''),
 (4, 'footer_struk', 'Terima kasih atas kunjungan Anda!'),
@@ -278,6 +287,13 @@ CREATE TABLE `users` (
   `status` varchar(50) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `username`, `password_hash`, `role`, `shift`, `status`, `created_at`) VALUES
+(1, 'yanto pea', 'yantoo', '$2y$10$x/W5Xk.uJ8yet8GTDnKwB.GdTWMRy5qd68/wDZW6tU27kTue4qS3S', 'kasir', '', 'active', '2026-04-30 10:33:50');
 
 --
 -- Indexes for dumped tables
@@ -411,7 +427,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `ingredients`
 --
 ALTER TABLE `ingredients`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `menus`
@@ -483,7 +499,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
