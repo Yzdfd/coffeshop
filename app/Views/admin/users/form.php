@@ -1,87 +1,95 @@
 <?= $this->include('admin/layouts/header') ?>
 
-<div class="card" style="max-width:560px">
-    <form action="<?= $formAction ?>" method="post">
-        <?= csrf_field() ?>
-        <div class="form-grid">
+<div class="card border-0 shadow-sm" style="max-width:600px">
+    <div class="card-header bg-white fw-semibold">
+        <i class="bi bi-person me-2"></i><?= $title ?>
+    </div>
+    <div class="card-body">
+        <form action="<?= $formAction ?>" method="post">
+            <?= csrf_field() ?>
+            <div class="row g-3">
 
-            <div class="form-group">
-                <label>Nama Lengkap <span style="color:red">*</span></label>
-                <input type="text" name="name"
-                       value="<?= old('name', $user['name'] ?? '') ?>" required>
-                <?php if (isset($errors['name'])): ?>
-                    <small style="color:red"><?= $errors['name'] ?></small>
-                <?php endif; ?>
-            </div>
-
-            <div class="form-group">
-                <label>Username <span style="color:red">*</span></label>
-                <input type="text" name="username"
-                       value="<?= old('username', $user['username'] ?? '') ?>" required>
-                <?php if (isset($errors['username'])): ?>
-                    <small style="color:red"><?= $errors['username'] ?></small>
-                <?php endif; ?>
-            </div>
-
-            <div class="form-group">
-                <label>Role <span style="color:red">*</span></label>
-                <select name="role" required>
-                    <option value="">-- Pilih Role --</option>
-                    <?php foreach (['admin','waiter','kasir','dapur','owner'] as $r): ?>
-                        <option value="<?= $r ?>" <?= old('role', $user['role'] ?? '') == $r ? 'selected' : '' ?>>
-                            <?= ucfirst($r) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Shift</label>
-                <select name="shift">
-                    <option value="">-- Pilih Shift --</option>
-                    <?php foreach (['Pagi','Siang','Malam'] as $sh): ?>
-                        <option value="<?= $sh ?>" <?= old('shift', $user['shift'] ?? '') == $sh ? 'selected' : '' ?>>
-                            <?= $sh ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Status</label>
-                <select name="status">
-                    <option value="active"   <?= old('status', $user['status'] ?? 'active') == 'active'   ? 'selected' : '' ?>>Aktif</option>
-                    <option value="inactive" <?= old('status', $user['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Nonaktif</option>
-                </select>
-            </div>
-
-            <?php if (! isset($user)): ?>
-            <div class="form-group">
-                <label>Password <span style="color:red">*</span></label>
-                <input type="password" name="password" required>
-                <?php if (isset($errors['password'])): ?>
-                    <small style="color:red"><?= $errors['password'] ?></small>
-                <?php endif; ?>
-            </div>
-            <div class="form-group">
-                <label>Konfirmasi Password <span style="color:red">*</span></label>
-                <input type="password" name="password_confirm" required>
-            </div>
-            <?php else: ?>
-            <div class="form-group full">
-                <div class="alert alert-warning" style="margin:0">
-                    ℹ️ Untuk ganti password, gunakan fitur <strong>Reset Password</strong> di tabel user.
+                <div class="col-md-6">
+                    <label class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input type="text" name="name" class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
+                           value="<?= old('name', $user['name'] ?? '') ?>" required>
+                    <?php if (isset($errors['name'])): ?>
+                        <div class="invalid-feedback"><?= $errors['name'] ?></div>
+                    <?php endif; ?>
                 </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Username <span class="text-danger">*</span></label>
+                    <input type="text" name="username" class="form-control <?= isset($errors['username']) ? 'is-invalid' : '' ?>"
+                           value="<?= old('username', $user['username'] ?? '') ?>" required>
+                    <?php if (isset($errors['username'])): ?>
+                        <div class="invalid-feedback"><?= $errors['username'] ?></div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Role <span class="text-danger">*</span></label>
+                    <select name="role" class="form-select" required>
+                        <option value="">-- Pilih Role --</option>
+                        <?php foreach (['admin','waiter','kasir','dapur','owner'] as $r): ?>
+                            <option value="<?= $r ?>" <?= old('role', $user['role'] ?? '') == $r ? 'selected' : '' ?>>
+                                <?= ucfirst($r) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Shift</label>
+                    <select name="shift" class="form-select">
+                        <option value="">-- Pilih Shift --</option>
+                        <?php foreach (['Pagi','Siang','Malam'] as $sh): ?>
+                            <option value="<?= $sh ?>" <?= old('shift', $user['shift'] ?? '') == $sh ? 'selected' : '' ?>>
+                                <?= $sh ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="active"   <?= old('status', $user['status'] ?? 'active') == 'active'   ? 'selected' : '' ?>>Aktif</option>
+                        <option value="inactive" <?= old('status', $user['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Nonaktif</option>
+                    </select>
+                </div>
+
+                <?php if (! isset($user)): ?>
+                <div class="col-md-6">
+                    <label class="form-label">Password <span class="text-danger">*</span></label>
+                    <input type="password" name="password" class="form-control <?= isset($errors['password']) ? 'is-invalid' : '' ?>" required>
+                    <?php if (isset($errors['password'])): ?>
+                        <div class="invalid-feedback"><?= $errors['password'] ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Konfirmasi Password <span class="text-danger">*</span></label>
+                    <input type="password" name="password_confirm" class="form-control" required>
+                </div>
+                <?php else: ?>
+                <div class="col-12">
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Untuk ganti password, gunakan tombol <strong>Reset Password</strong> di halaman daftar user.
+                    </div>
+                </div>
+                <?php endif; ?>
+
             </div>
-            <?php endif; ?>
 
-        </div>
-
-        <div class="form-footer">
-            <button type="submit" class="btn btn-primary">💾 Simpan</button>
-            <a href="<?= base_url('admin/users') ?>" class="btn btn-secondary">Batal</a>
-        </div>
-    </form>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save me-1"></i> Simpan
+                </button>
+                <a href="<?= base_url('admin/users') ?>" class="btn btn-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?= $this->include('admin/layouts/footer') ?>

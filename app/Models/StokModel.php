@@ -10,17 +10,17 @@ class StokModel extends Model
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'supplier_id', 'name', 'unit', 'stock_qty', 'min_stock'
+        'supplier_id', 'name', 'stock_qty', 'min_stock', 'unit',
     ];
 
     protected $useTimestamps = true;
-    protected $createdField  = 'created_at'; // FIX: jangan kosong
+    protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
     public function getStokRendah(): array
     {
-        return $this->db->table($this->table)
-            ->where('stock_qty <= min_stock') // FIX utama
+        return $this->db->table('ingredients')
+            ->where('stock_qty <=', $this->db->protectIdentifiers('min_stock'), false)
             ->get()
             ->getResultArray();
     }
