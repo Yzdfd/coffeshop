@@ -6,11 +6,11 @@
         <p style="margin-bottom:4px;color:#888;font-size:12px">Bahan</p>
         <p style="font-size:16px;font-weight:600"><?= esc($stok['name']) ?></p>
         <p style="margin-top:6px;color:#888;font-size:12px">Stok saat ini</p>
-        <p style="font-size:18px;font-weight:700;color:#2e7d32"><?= $stok['stock'] ?> <?= esc($stok['unit']) ?></p>
+        <p style="font-size:18px;font-weight:700;color:#2e7d32"><?= $stok['stock_qty'] ?> <?= esc($stok['unit']) ?></p>
     </div>
 
     <?php if (session()->getFlashdata('error')): ?>
-        <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
     <?php endif; ?>
 
     <form action="<?= base_url('admin/stok/tambah/' . $stok['id']) ?>" method="post">
@@ -18,7 +18,7 @@
         <div class="form-group" style="margin-bottom:14px">
             <label>Jumlah Tambah <span style="color:red">*</span></label>
             <input type="number" name="jumlah" step="0.01" min="0.01" required
-                   placeholder="Masukkan jumlah yang ditambahkan">
+                placeholder="Masukkan jumlah yang ditambahkan">
         </div>
         <div class="form-group" style="margin-bottom:16px">
             <label>Keterangan Pengadaan</label>

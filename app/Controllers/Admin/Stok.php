@@ -25,11 +25,11 @@ class Stok extends BaseController
             $builder->like('name', $search);
         }
         if ($filter === 'ok') {
-            $builder->where('stock > min_stock');
+            $builder->where('stock_qty > min_stock');
         } elseif ($filter === 'low') {
-            $builder->where('stock > 0')->where('stock <= min_stock');
+            $builder->where('stock_qty > 0')->where('stock_qty <= min_stock');
         } elseif ($filter === 'empty') {
-            $builder->where('stock', 0);
+            $builder->where('stock_qty', 0);
         }
 
         $data = [
@@ -59,7 +59,7 @@ class Stok extends BaseController
         $rules = [
             'name'  => 'required|min_length[2]|max_length[100]',
             'unit'  => 'required',
-            'stock' => 'required|numeric|greater_than_equal_to[0]',
+            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -70,7 +70,7 @@ class Stok extends BaseController
         $this->stokModel->insert([
             'name'      => $this->request->getPost('name'),
             'unit'      => $this->request->getPost('unit'),
-            'stock'     => $this->request->getPost('stock'),
+            'stock_qty' => $this->request->getPost('stock_qty'),
             'min_stock' => $this->request->getPost('min_stock') ?? 5,
             'price'     => $this->request->getPost('price') ?? 0,
             'notes'     => $this->request->getPost('notes'),
@@ -107,7 +107,7 @@ class Stok extends BaseController
         $rules = [
             'name'  => 'required|min_length[2]|max_length[100]',
             'unit'  => 'required',
-            'stock' => 'required|numeric|greater_than_equal_to[0]',
+            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -118,7 +118,7 @@ class Stok extends BaseController
         $this->stokModel->update($id, [
             'name'      => $this->request->getPost('name'),
             'unit'      => $this->request->getPost('unit'),
-            'stock'     => $this->request->getPost('stock'),
+            'stock_qty' => $this->request->getPost('stock_qty'),
             'min_stock' => $this->request->getPost('min_stock'),
             'price'     => $this->request->getPost('price'),
             'notes'     => $this->request->getPost('notes'),
@@ -141,8 +141,8 @@ class Stok extends BaseController
                 return redirect()->back()->with('error', 'Jumlah harus lebih dari 0.');
             }
 
-            $stokBaru = (float)$stok['stock'] + $jumlah;
-            $this->stokModel->update($id, ['stock' => $stokBaru]);
+            $stokBaru = (float)$stok['stock_qty'] + $jumlah;
+            $this->stokModel->update($id, ['stock_qty' => $stokBaru]);
 
             return redirect()->to(base_url('admin/stok'))
                 ->with('success', 'Stok berhasil ditambahkan sebanyak ' . $jumlah . ' ' . $stok['unit'] . '.');

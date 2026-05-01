@@ -5,60 +5,79 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
-$routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($routes) {
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+$routes->get('/',        'Auth::loginPage');    // Root redirect ke login
+$routes->get('login',   'Auth::loginPage');
+$routes->post('login',  'Auth::loginProcess');
+$routes->get('logout',  'Auth::logout');
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+// Gunakan filter 'auth:admin' agar hanya role admin yang bisa akses
+$routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'auth:admin'], function ($routes) {
 
     // ─── DASHBOARD ───────────────────────────────────────────
-    // URL: /admin/dashboard
-    // Menampilkan ringkasan sistem (total menu, stok rendah, dll)
     $routes->get('dashboard', 'Dashboard::index');
-    $routes->get('/', 'Dashboard::index');
+    $routes->get('/',         'Dashboard::index');
 
     // ─── MENU ────────────────────────────────────────────────
-    // URL: /admin/menu
-    // CRUD menu café (nama, harga, kategori, gambar, varian)
-    $routes->get('menu',                'Menu::index');         // Daftar semua menu
-    $routes->get('menu/create',         'Menu::create');        // Form tambah menu
-    $routes->post('menu/store',         'Menu::store');         // Simpan menu baru
-    $routes->get('menu/edit/(:num)',    'Menu::edit/$1');       // Form edit menu
-    $routes->post('menu/update/(:num)', 'Menu::update/$1');     // Simpan perubahan menu
-    $routes->get('menu/delete/(:num)',  'Menu::delete/$1');     // Hapus menu
+    $routes->get('menu',                'Menu::index');
+    $routes->get('menu/create',         'Menu::create');
+    $routes->post('menu/store',         'Menu::store');
+    $routes->get('menu/edit/(:num)',    'Menu::edit/$1');
+    $routes->post('menu/update/(:num)', 'Menu::update/$1');
+    $routes->get('menu/delete/(:num)',  'Menu::delete/$1');
 
     // ─── KATEGORI ────────────────────────────────────────────
-    // URL: /admin/kategori
-    // Kelola kategori menu (Minuman Panas, Makanan Berat, dll)
-    $routes->get('kategori',                'Kategori::index');         // Daftar + form tambah
-    $routes->post('kategori/store',         'Kategori::store');         // Simpan kategori baru
-    $routes->get('kategori/edit/(:num)',    'Kategori::edit/$1');       // Form edit kategori
-    $routes->post('kategori/update/(:num)', 'Kategori::update/$1');     // Simpan perubahan
-    $routes->get('kategori/delete/(:num)',  'Kategori::delete/$1');     // Hapus kategori
+    $routes->get('kategori',                'Kategori::index');
+    $routes->post('kategori/store',         'Kategori::store');
+    $routes->get('kategori/edit/(:num)',    'Kategori::edit/$1');
+    $routes->post('kategori/update/(:num)', 'Kategori::update/$1');
+    $routes->get('kategori/delete/(:num)',  'Kategori::delete/$1');
 
     // ─── STOK BAHAN ──────────────────────────────────────────
-    // URL: /admin/stok
-    // Kelola stok bahan baku (kopi, susu, gula, dll)
-    // Notifikasi otomatis kalau stok di bawah minimum
-    $routes->get('stok',                'Stok::index');         // Daftar semua bahan
-    $routes->get('stok/create',         'Stok::create');        // Form tambah bahan baru
-    $routes->post('stok/store',         'Stok::store');         // Simpan bahan baru
-    $routes->get('stok/edit/(:num)',    'Stok::edit/$1');       // Form edit bahan
-    $routes->post('stok/update/(:num)', 'Stok::update/$1');     // Simpan perubahan bahan
-    $routes->match(['get','post'], 'stok/tambah/(:num)', 'Stok::tambah/$1'); // Tambah jumlah stok
-    $routes->get('stok/delete/(:num)',  'Stok::delete/$1');     // Hapus bahan
+    $routes->get('stok',                'Stok::index');
+    $routes->get('stok/create',         'Stok::create');
+    $routes->post('stok/store',         'Stok::store');
+    $routes->get('stok/edit/(:num)',    'Stok::edit/$1');
+    $routes->post('stok/update/(:num)', 'Stok::update/$1');
+    $routes->match(['get','post'], 'stok/tambah/(:num)', 'Stok::tambah/$1');
+    $routes->get('stok/delete/(:num)',  'Stok::delete/$1');
 
     // ─── KELOLA USER ─────────────────────────────────────────
-    // URL: /admin/users
-    // Buat dan kelola akun waiter, kasir, dapur, owner
-    $routes->get('users',                        'Users::index');            // Daftar semua user
-    $routes->get('users/create',                 'Users::create');           // Form tambah user
-    $routes->post('users/store',                 'Users::store');            // Simpan user baru
-    $routes->get('users/edit/(:num)',            'Users::edit/$1');          // Form edit user
-    $routes->post('users/update/(:num)',         'Users::update/$1');        // Simpan perubahan user
-    $routes->get('users/reset-password/(:num)',  'Users::resetPassword/$1'); // Reset password ke default
-    $routes->get('users/delete/(:num)',          'Users::delete/$1');        // Hapus user
+    $routes->get('users',                        'Users::index');
+    $routes->get('users/create',                 'Users::create');
+    $routes->post('users/store',                 'Users::store');
+    $routes->get('users/edit/(:num)',            'Users::edit/$1');
+    $routes->post('users/update/(:num)',         'Users::update/$1');
+    $routes->get('users/reset-password/(:num)',  'Users::resetPassword/$1');
+    $routes->get('users/delete/(:num)',          'Users::delete/$1');
 
     // ─── SETTING SISTEM ──────────────────────────────────────
-    // URL: /admin/setting
-    // Atur nama café, pajak, service charge, jumlah meja, dll
-    $routes->get('setting',        'Setting::index'); // Halaman setting
-    $routes->post('setting/save',  'Setting::save');  // Simpan setting
+    $routes->get('setting',       'Setting::index');
+    $routes->post('setting/save', 'Setting::save');
 });
+
+// ─── KASIR ───────────────────────────────────────────────────────────────────
+// $routes->group('kasir', ['namespace' => 'App\Controllers\Kasir', 'filter' => 'auth:kasir,admin'], function ($routes) {
+//     $routes->get('dashboard', 'Dashboard::index');
+//     // ... tambah routes kasir di sini
+// });
+
+// ─── WAITER ──────────────────────────────────────────────────────────────────
+// $routes->group('waiter', ['namespace' => 'App\Controllers\Waiter', 'filter' => 'auth:waiter,admin'], function ($routes) {
+//     $routes->get('dashboard', 'Dashboard::index');
+//     // ... tambah routes waiter di sini
+// });
+
+// ─── DAPUR ───────────────────────────────────────────────────────────────────
+// $routes->group('dapur', ['namespace' => 'App\Controllers\Dapur', 'filter' => 'auth:dapur,admin'], function ($routes) {
+//     $routes->get('dashboard', 'Dashboard::index');
+//     // ... tambah routes dapur di sini
+// });
+
+// ─── OWNER ───────────────────────────────────────────────────────────────────
+// $routes->group('owner', ['namespace' => 'App\Controllers\Owner', 'filter' => 'auth:owner,admin'], function ($routes) {
+//     $routes->get('dashboard', 'Dashboard::index');
+//     // ... tambah routes owner di sini
+// });

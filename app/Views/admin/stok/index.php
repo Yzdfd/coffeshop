@@ -1,10 +1,10 @@
 <?= $this->include('admin/layouts/header') ?>
 
 <?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
+<div class="alert alert-success"><?= session()->getFlashdata('success') ?></div>
 <?php endif; ?>
 <?php if (session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
+<div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
 <?php endif; ?>
 
 <div class="card">
@@ -16,8 +16,8 @@
                     <input type="text" name="search" value="<?= esc($search ?? '') ?>" placeholder="Cari nama bahan...">
                     <select name="filter">
                         <option value="">Semua Status</option>
-                        <option value="ok"    <?= ($filter ?? '') == 'ok'    ? 'selected' : '' ?>>Stok Aman</option>
-                        <option value="low"   <?= ($filter ?? '') == 'low'   ? 'selected' : '' ?>>Hampir Habis</option>
+                        <option value="ok" <?= ($filter ?? '') == 'ok'    ? 'selected' : '' ?>>Stok Aman</option>
+                        <option value="low" <?= ($filter ?? '') == 'low'   ? 'selected' : '' ?>>Hampir Habis</option>
                         <option value="empty" <?= ($filter ?? '') == 'empty' ? 'selected' : '' ?>>Habis</option>
                     </select>
                     <button type="submit" class="btn btn-secondary">Filter</button>
@@ -43,13 +43,15 @@
             </thead>
             <tbody>
                 <?php if (empty($stoks)): ?>
-                <tr><td colspan="9" style="text-align:center;color:#aaa;padding:30px">Tidak ada data inventory.</td></tr>
+                <tr>
+                    <td colspan="9" style="text-align:center;color:#aaa;padding:30px">Tidak ada data inventory.</td>
+                </tr>
                 <?php else: ?>
                 <?php $no = 1; foreach ($stoks as $s):
-                    if ($s['stock'] <= 0) {
+                    if ($s['stock_qty'] <= 0) {
                         $statusClass = 'stok-out';
                         $badge = '<span class="badge badge-danger">Habis</span>';
-                    } elseif ($s['stock'] <= $s['min_stock']) {
+                    } elseif ($s['stock_qty'] <= $s['min_stock']) {
                         $statusClass = 'stok-low';
                         $badge = '<span class="badge badge-warning">Hampir Habis</span>';
                     } else {
@@ -68,11 +70,12 @@
                     <td><?= $badge ?></td>
                     <td>
                         <div class="btn-group">
-                            <a href="<?= base_url('admin/stok/tambah/' . $s['id']) ?>" class="btn btn-success btn-sm">+ Stok</a>
-                            <a href="<?= base_url('admin/stok/edit/' . $s['id']) ?>" class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="<?= base_url('admin/stok/delete/' . $s['id']) ?>"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Hapus bahan ini?')">Hapus</a>
+                            <a href="<?= base_url('admin/stok/tambah/' . $s['id']) ?>" class="btn btn-success btn-sm">+
+                                Stok</a>
+                            <a href="<?= base_url('admin/stok/edit/' . $s['id']) ?>"
+                                class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="<?= base_url('admin/stok/delete/' . $s['id']) ?>" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Hapus bahan ini?')">Hapus</a>
                         </div>
                     </td>
                 </tr>
