@@ -54,8 +54,8 @@
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
-                        <option value="active"   <?= old('status', $user['status'] ?? 'active') == 'active'   ? 'selected' : '' ?>>Aktif</option>
-                        <option value="inactive" <?= old('status', $user['status'] ?? '') == 'inactive' ? 'selected' : '' ?>>Nonaktif</option>
+                        <option value="aktif"    <?= old('status', $user['status'] ?? 'aktif') == 'aktif'    ? 'selected' : '' ?>>Aktif</option>
+<option value="nonaktif" <?= old('status', $user['status'] ?? '') == 'nonaktif' ? 'selected' : '' ?>>Nonaktif</option>
                     </select>
                 </div>
 

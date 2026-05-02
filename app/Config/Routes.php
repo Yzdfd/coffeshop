@@ -59,9 +59,28 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
 });
 
 // ─── KASIR ───────────────────────────────────────────────────────────────────
-$routes->group('kasir', ['namespace' => 'App\Controllers\Kasir', 'filter' => 'auth:kasir'], function ($routes) {
+$routes->group('kasir', ['namespace' => 'App\\Controllers\\Kasir', 'filter' => 'auth:kasir'], function ($routes) {
+    $routes->get('/',         'Dashboard::index');
     $routes->get('dashboard', 'Dashboard::index');
-    // ... tambah routes kasir di sini
+
+    // ─── PESANAN ─────────────────────────────────────────────
+    $routes->get('pesanan',                       'Pesanan::index');
+    $routes->get('pesanan/buat',                  'Pesanan::buat');
+    $routes->post('pesanan/store',                'Pesanan::store');
+    $routes->get('pesanan/detail/(:num)',         'Pesanan::detail/$1');
+    $routes->match(['get','post'], 'pesanan/tambah-item/(:num)', 'Pesanan::tambahItem/$1');
+    $routes->get('pesanan/cancel/(:num)',         'Pesanan::cancel/$1');
+
+    // ─── PEMBAYARAN ──────────────────────────────────────────
+    $routes->get('pembayaran',                    'Pembayaran::index');
+    $routes->get('pembayaran/(:num)',             'Pembayaran::form/$1');
+    $routes->post('pembayaran/proses/(:num)',     'Pembayaran::proses/$1');
+    $routes->get('pembayaran/cek-promo',          'Pembayaran::cekPromo');
+
+    // ─── TRANSAKSI ───────────────────────────────────────────
+    $routes->get('transaksi',                     'Transaksi::index');
+    $routes->get('transaksi/struk/(:num)',        'Transaksi::struk/$1');
+    $routes->get('transaksi/void/(:num)',         'Transaksi::void/$1');
 });
 
 // ─── WAITER ──────────────────────────────────────────────────────────────────
@@ -81,3 +100,5 @@ $routes->group('owner', ['namespace' => 'App\Controllers\Owner', 'filter' => 'au
     $routes->get('dashboard', 'Dashboard::index');
     // ... tambah routes owner di sini
 });
+
+$routes->get('/generate-hash', 'Auth::generateHash');

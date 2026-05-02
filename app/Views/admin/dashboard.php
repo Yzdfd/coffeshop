@@ -1,6 +1,5 @@
 <?= $this->include('admin/layouts/header') ?>
 
-<!-- Stat Cards -->
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
         <div class="card border-0 shadow-sm h-100">
@@ -48,7 +47,6 @@
     </div>
 </div>
 
-<!-- Peringatan Stok -->
 <?php if (!empty($stokPeringatan)): ?>
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-white fw-semibold">
@@ -70,11 +68,13 @@
                     <?php foreach ($stokPeringatan as $s): ?>
                     <tr>
                         <td><?= esc($s['name']) ?></td>
-                        <td class="<?= $s['stock'] == 0 ? 'stok-out' : 'stok-low' ?>"><?= $s['stock'] ?></td>
+                        <td class="<?= $s['stock_qty'] == 0 ? 'stok-out' : 'stok-low' ?>">
+                            <?= $s['stock_qty'] ?>
+                        </td>
                         <td><?= esc($s['unit']) ?></td>
                         <td><?= $s['min_stock'] ?></td>
                         <td>
-                            <?php if ($s['stock'] == 0): ?>
+                            <?php if ($s['stock_qty'] == 0): ?>
                                 <span class="badge bg-danger">Habis</span>
                             <?php else: ?>
                                 <span class="badge bg-warning text-dark">Hampir Habis</span>

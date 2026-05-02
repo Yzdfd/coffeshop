@@ -57,9 +57,9 @@ class Stok extends BaseController
     public function store()
     {
         $rules = [
-            'name'  => 'required|min_length[2]|max_length[100]',
-            'unit'  => 'required',
-            'stock' => 'required|numeric|greater_than_equal_to[0]',
+            'name'      => 'required|min_length[2]|max_length[100]',
+            'unit'      => 'required',
+            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {
@@ -103,9 +103,9 @@ class Stok extends BaseController
         }
 
         $rules = [
-            'name'  => 'required|min_length[2]|max_length[100]',
-            'unit'  => 'required',
-            'stock' => 'required|numeric|greater_than_equal_to[0]',
+            'name'      => 'required|min_length[2]|max_length[100]',
+            'unit'      => 'required',
+            'stock_qty' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
         if (! $this->validate($rules)) {

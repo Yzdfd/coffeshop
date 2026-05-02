@@ -1,8 +1,8 @@
 /* ===== SIDEBAR ===== */
-#wrapper {
+.wrapper {
     min-height: 100vh;
+    display: flex;        /* ← tambah ini supaya sidebar & konten sejajar */
 }
-
 .sidebar {
     width: 230px;
     min-height: 100vh;
@@ -63,9 +63,10 @@
 }
 
 /* ===== MAIN ===== */
-#main-content {
+.main-content {
     background: #f0f2f5;
     min-height: 100vh;
+    flex: 2;              /* ← tambah ini supaya konten mengisi sisa ruang */
 }
 
 /* ===== STOK STATUS ===== */

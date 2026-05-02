@@ -7,10 +7,8 @@ use App\Models\UserModel;
 
 class Auth extends BaseController
 {
-    // ─── Halaman Login ────────────────────────────────────────────────────────
     public function loginPage()
     {
-        // Kalau sudah login, redirect sesuai role
         if (session()->get('logged_in')) {
             return $this->redirectByRole(session()->get('role'));
         }
@@ -18,7 +16,6 @@ class Auth extends BaseController
         return view('auth/login');
     }
 
-    // ─── Proses Login ─────────────────────────────────────────────────────────
     public function loginProcess()
     {
         $rules = [
@@ -36,9 +33,7 @@ class Auth extends BaseController
         $password = $this->request->getPost('password');
 
         $userModel = new UserModel();
-        $user = $userModel->where('username', $username)
-                          ->where('status', 'aktif')
-                          ->first();
+        $user = $userModel->findForLogin($username);
 
         if (! $user) {
             return redirect()->back()
@@ -52,7 +47,6 @@ class Auth extends BaseController
                 ->with('error', 'Password yang Anda masukkan salah.');
         }
 
-        // Simpan data session
         session()->set([
             'logged_in' => true,
             'user_id'   => $user['id'],
@@ -62,13 +56,9 @@ class Auth extends BaseController
             'shift'     => $user['shift'],
         ]);
 
-        // Catat activity log (opsional, kalau ada ActivityLogModel)
-        // $this->logActivity($user['id'], 'login', 'User login ke sistem');
-
         return $this->redirectByRole($user['role']);
     }
 
-    // ─── Logout ───────────────────────────────────────────────────────────────
     public function logout()
     {
         session()->destroy();
@@ -76,7 +66,6 @@ class Auth extends BaseController
             ->with('success', 'Anda berhasil keluar dari sistem.');
     }
 
-    // ─── Helper: Redirect Berdasarkan Role ────────────────────────────────────
     private function redirectByRole(string $role)
     {
         return match ($role) {

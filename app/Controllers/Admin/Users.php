@@ -74,7 +74,7 @@ class Users extends BaseController
             'username'      => $this->request->getPost('username'),
             'role'          => $this->request->getPost('role'),
             'shift'         => $this->request->getPost('shift'),
-            'status'        => $this->request->getPost('status') ?? 'active',
+            'status' => $this->request->getPost('status') ?? 'aktif',
             'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
         ]);
 
