@@ -1,16 +1,16 @@
 <?= $this->include('admin/layouts/header') ?>
 
 <?php if (session()->getFlashdata('success')): ?>
-    <div class="alert alert-success alert-dismissible fade show">
-        <?= session()->getFlashdata('success') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+<div class="alert alert-success alert-dismissible fade show">
+    <?= session()->getFlashdata('success') ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
 <?php endif; ?>
 <?php if (session()->getFlashdata('error')): ?>
-    <div class="alert alert-danger alert-dismissible fade show">
-        <?= session()->getFlashdata('error') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
+<div class="alert alert-danger alert-dismissible fade show">
+    <?= session()->getFlashdata('error') ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
 <?php endif; ?>
 
 <div class="card border-0 shadow-sm">
@@ -20,14 +20,14 @@
                 <i class="bi bi-person-plus me-1"></i> Tambah User
             </a>
             <form method="get" class="d-flex gap-2 flex-wrap">
-                <input type="text" name="search" class="form-control form-control-sm"
-                       value="<?= esc($search ?? '') ?>" placeholder="Cari nama / username...">
+                <input type="text" name="search" class="form-control form-control-sm" value="<?= esc($search ?? '') ?>"
+                    placeholder="Cari nama / username...">
                 <select name="role" class="form-select form-select-sm" style="width:auto">
                     <option value="">Semua Role</option>
                     <?php foreach (['admin','waiter','kasir','dapur','owner'] as $r): ?>
-                        <option value="<?= $r ?>" <?= ($filterRole ?? '') == $r ? 'selected' : '' ?>>
-                            <?= ucfirst($r) ?>
-                        </option>
+                    <option value="<?= $r ?>" <?= ($filterRole ?? '') == $r ? 'selected' : '' ?>>
+                        <?= ucfirst($r) ?>
+                    </option>
                     <?php endforeach; ?>
                 </select>
                 <button type="submit" class="btn btn-secondary btn-sm">Filter</button>
@@ -51,7 +51,9 @@
                 </thead>
                 <tbody>
                     <?php if (empty($users)): ?>
-                    <tr><td colspan="8" class="text-center text-muted py-4">Tidak ada user.</td></tr>
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Tidak ada user.</td>
+                    </tr>
                     <?php else: ?>
                     <?php $no = 1; foreach ($users as $u): ?>
                     <tr>
@@ -73,27 +75,25 @@
                         </td>
                         <td><?= esc($u['shift'] ?? '—') ?></td>
                         <td>
-                            <?php if ($u['status'] == 'active'): ?>
-                                <span class="badge bg-success">Aktif</span>
+                            <?php if ($u['status'] == 'aktif'): ?>
+                            <span class="badge bg-success">Aktif</span>
                             <?php else: ?>
-                                <span class="badge bg-danger">Nonaktif</span>
+                            <span class="badge bg-danger">Nonaktif</span>
                             <?php endif; ?>
                         </td>
                         <td><?= date('d M Y', strtotime($u['created_at'])) ?></td>
                         <td>
-                            <a href="<?= base_url('admin/users/edit/' . $u['id']) ?>"
-                               class="btn btn-secondary btn-sm">
+                            <a href="<?= base_url('admin/users/edit/' . $u['id']) ?>" class="btn btn-secondary btn-sm">
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a href="<?= base_url('admin/users/reset-password/' . $u['id']) ?>"
-                               class="btn btn-warning btn-sm"
-                               onclick="return confirm('Reset password user ini ke: password123?')">
+                                class="btn btn-warning btn-sm"
+                                onclick="return confirm('Reset password user ini ke: password123?')">
                                 <i class="bi bi-key"></i>
                             </a>
                             <?php if ($u['id'] != session('user_id')): ?>
-                            <a href="<?= base_url('admin/users/delete/' . $u['id']) ?>"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Hapus user ini?')">
+                            <a href="<?= base_url('admin/users/delete/' . $u['id']) ?>" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Hapus user ini?')">
                                 <i class="bi bi-trash"></i>
                             </a>
                             <?php endif; ?>
