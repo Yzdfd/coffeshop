@@ -51,7 +51,7 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     $routes->get('users/edit/(:num)',            'Users::edit/$1');
     $routes->post('users/update/(:num)',         'Users::update/$1');
     $routes->get('users/reset-password/(:num)',  'Users::resetPassword/$1');
-    $routes->get('users/delete/(:num)',          'Users::delete/$1');
+    $routes->get('users/toggle/(:num)', 'Users::toggle/$1');
 
     // Promo─────────────────────────────────────────
     $routes->get('promo',                'Promo::index');
@@ -65,6 +65,9 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     // ─── SETTING SISTEM ──────────────────────────────────────
     $routes->get('setting',       'Setting::index');
     $routes->post('setting/save', 'Setting::save');
+
+
+  
 });
 
 // ─── KASIR ───────────────────────────────────────────────────────────────────

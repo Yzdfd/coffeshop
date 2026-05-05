@@ -152,4 +152,20 @@ class Users extends BaseController
         return redirect()->to(base_url('admin/users'))
             ->with('success', 'User berhasil dihapus.');
     }
+
+    public function toggle($id)
+{
+    $user = $this->userModel->find($id);
+    if (!$user) {
+        return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
+    }
+
+    $newStatus = $user['status'] == 'aktif' ? 'nonaktif' : 'aktif';
+    $this->userModel->update($id, ['status' => $newStatus]);
+
+    $label = $newStatus == 'aktif' ? 'diaktifkan' : 'dinonaktifkan';
+    return redirect()->to(base_url('admin/users'))
+        ->with('success', 'User "' . $user['username'] . '" berhasil ' . $label . '.');
+}
+
 }

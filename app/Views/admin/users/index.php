@@ -87,15 +87,26 @@
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a href="<?= base_url('admin/users/reset-password/' . $u['id']) ?>"
-                                class="btn btn-warning btn-sm"
-                                onclick="return confirm('Reset password user ini ke: password123?')">
+                            class="btn btn-warning btn-sm"
+                            onclick="return confirm('Reset password user ini ke: password123?')">
                                 <i class="bi bi-key"></i>
                             </a>
                             <?php if ($u['id'] != session('user_id')): ?>
-                            <a href="<?= base_url('admin/users/delete/' . $u['id']) ?>" class="btn btn-danger btn-sm"
-                                onclick="return confirm('Hapus user ini?')">
-                                <i class="bi bi-trash"></i>
-                            </a>
+                                <?php if ($u['status'] == 'aktif'): ?>
+                                <a href="<?= base_url('admin/users/toggle/' . $u['id']) ?>"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Nonaktifkan user ini?')"
+                                title="Nonaktifkan">
+                                    <i class="bi bi-person-slash"></i>
+                                </a>
+                                <?php else: ?>
+                                <a href="<?= base_url('admin/users/toggle/' . $u['id']) ?>"
+                                class="btn btn-success btn-sm"
+                                onclick="return confirm('Aktifkan user ini?')"
+                                title="Aktifkan">
+                                    <i class="bi bi-person-check"></i>
+                                </a>
+                                <?php endif; ?>
                             <?php endif; ?>
                         </td>
                     </tr>
