@@ -40,6 +40,11 @@
                     class="nav-item <?= (strpos(current_url(), 'admin/stok') !== false) ? 'active' : '' ?>">
                     <span class="nav-icon">📦</span> Stok Bahan
                 </a>
+
+                <a href="<?= base_url('admin/promo') ?>"
+                    class="nav-item <?= strpos(current_url(), 'admin/promo') !== false ? 'active' : '' ?>">
+                      <span class="nav-icon">🎁</span> Promo
+                </a>
                 <a href="<?= base_url('admin/users') ?>"
                     class="nav-item <?= (strpos(current_url(), 'admin/users') !== false) ? 'active' : '' ?>">
                     <span class="nav-icon">👥</span> Kelola User

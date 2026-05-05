@@ -53,6 +53,15 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     $routes->get('users/reset-password/(:num)',  'Users::resetPassword/$1');
     $routes->get('users/delete/(:num)',          'Users::delete/$1');
 
+    // Promo─────────────────────────────────────────
+    $routes->get('promo',                'Promo::index');
+    $routes->get('promo/create',         'Promo::create');
+    $routes->post('promo/store',         'Promo::store');
+    $routes->get('promo/edit/(:num)',    'Promo::edit/$1');
+    $routes->post('promo/update/(:num)', 'Promo::update/$1');
+    $routes->get('promo/toggle/(:num)',  'Promo::toggle/$1');
+    $routes->get('promo/delete/(:num)',  'Promo::delete/$1');
+
     // ─── SETTING SISTEM ──────────────────────────────────────
     $routes->get('setting',       'Setting::index');
     $routes->post('setting/save', 'Setting::save');

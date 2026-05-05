@@ -11,7 +11,6 @@
             <div class="card-body">
                 <form action="<?= base_url('kasir/pembayaran/proses/' . $order['id']) ?>" method="post">
                     <?= csrf_field() ?>
-
                     <!-- Ringkasan Item -->
                     <div class="table-responsive mb-3">
                         <table class="table table-sm table-bordered">

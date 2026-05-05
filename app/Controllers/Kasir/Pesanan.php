@@ -45,7 +45,8 @@ class Pesanan extends BaseController
 
         $menuBuilder = $this->db->table('menus m')
             ->select('m.*, c.name as nama_kategori')
-            ->join('categories c', 'c.id = m.category_id', 'left');
+            ->join('categories c', 'c.id = m.category_id', 'left')
+            ->where('m.status', 'available');
 
         if ($filterKategori) {
             $menuBuilder->where('m.category_id', $filterKategori);
@@ -70,7 +71,7 @@ class Pesanan extends BaseController
             return redirect()->back()->with('error', 'Tidak ada item pesanan.');
         }
 
-        // Buat order
+        // Buat order - langsung status open, siap dibayar
         $this->db->table('orders')->insert([
             'table_id'   => $tableId,
             'waiter_id'  => session('user_id'),
@@ -103,8 +104,9 @@ class Pesanan extends BaseController
             ]);
         }
 
-        return redirect()->to(base_url('kasir/pesanan/detail/' . $orderId))
-            ->with('success', 'Pesanan #' . $orderId . ' berhasil dibuat dan dikirim ke dapur!');
+        // Langsung redirect ke pembayaran
+        return redirect()->to(base_url('kasir/pembayaran/' . $orderId))
+            ->with('success', 'Pesanan #' . $orderId . ' berhasil dibuat, silakan proses pembayaran.');
     }
 
     // ─── DETAIL PESANAN ───────────────────────────────────────
@@ -139,11 +141,11 @@ class Pesanan extends BaseController
         ]);
     }
 
-    // ─── TAMBAH ITEM ─────────────────────────────────────────
+    // ─── TAMBAH ITEM ──────────────────────────────────────────
     public function tambahItem($id)
     {
         $order = $this->db->table('orders')->where('id', $id)->get()->getRowArray();
-        if (!$order || !in_array($order['status'], ['open', 'process'])) {
+        if (!$order || !in_array($order['status'], ['open'])) {
             return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan tidak bisa diubah.');
         }
 
@@ -192,13 +194,14 @@ class Pesanan extends BaseController
             return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan tidak ditemukan.');
         }
 
-        if (!in_array($order['status'], ['open', 'process'])) {
-            return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan tidak bisa dibatalkan.');
+        if ($order['status'] !== 'open') {
+            return redirect()->to(base_url('kasir/pesanan'))
+                ->with('error', 'Pesanan tidak bisa dibatalkan karena sudah ' . $order['status'] . '.');
         }
 
         $this->db->table('orders')->where('id', $id)->update(['status' => 'cancelled']);
+        $this->db->table('order_items')->where('order_id', $id)->update(['status' => 'cancelled']);
 
-        // Bebaskan meja
         if ($order['table_id']) {
             $this->db->table('tables')->where('id', $order['table_id'])->update([
                 'status'           => 'available',

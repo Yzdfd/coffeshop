@@ -46,7 +46,7 @@
                     </p>
                 </div>
                 <div class="card-footer bg-white border-top-0">
-                    <a href="<?= base_url('kasir/pembayaran/form/' . $order['id']) ?>"
+                    <a href="<?= base_url('kasir/pembayaran/' . $order['id']) ?>"
                        class="btn btn-primary w-100 btn-sm">
                         <i class="bi bi-cash me-1"></i> Proses Pembayaran
                     </a>

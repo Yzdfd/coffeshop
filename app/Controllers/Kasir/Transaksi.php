@@ -90,10 +90,7 @@ class Transaksi extends BaseController
             return redirect()->to(base_url('kasir/transaksi'))->with('error', 'Transaksi tidak ditemukan.');
         }
 
-        // Update status transaksi
         $this->db->table('transactions')->where('id', $id)->update(['status' => 'void']);
-
-        // Kembalikan status order
         $this->db->table('orders')->where('id', $transaksi['order_id'])->update(['status' => 'cancelled']);
 
         return redirect()->to(base_url('kasir/transaksi'))

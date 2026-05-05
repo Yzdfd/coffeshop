@@ -13,14 +13,14 @@ class Pembayaran extends BaseController
         $this->db = \Config\Database::connect();
     }
 
-    // ─── DAFTAR PESANAN SIAP BAYAR ────────────────────────────
+    // ─── DAFTAR PESANAN BELUM DIBAYAR ────────────────────────
     public function index()
     {
         $orders = $this->db->table('orders o')
             ->select('o.*, t.number as table_number, u.name as kasir_name')
             ->join('tables t', 't.id = o.table_id',  'left')
             ->join('users u',  'u.id = o.waiter_id', 'left')
-            ->where('o.status', 'ready')
+            ->where('o.status', 'open')
             ->orderBy('o.ordered_at', 'DESC')
             ->get()->getResultArray();
 
@@ -43,6 +43,15 @@ class Pembayaran extends BaseController
             return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan tidak ditemukan.');
         }
 
+        // Pesanan yang bisa dibayar hanya yang statusnya open
+        if ($order['status'] === 'paid') {
+            return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan sudah dibayar.');
+        }
+
+        if ($order['status'] === 'cancelled') {
+            return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan sudah dibatalkan.');
+        }
+
         $items = $this->db->table('order_items oi')
             ->select('oi.*, m.name as menu_name')
             ->join('menus m', 'm.id = oi.menu_id', 'left')
@@ -50,18 +59,17 @@ class Pembayaran extends BaseController
             ->where('oi.status !=', 'cancelled')
             ->get()->getResultArray();
 
-        // Hitung total
         $subtotal = array_sum(array_map(fn($i) => $i['unit_price'] * $i['qty'], $items));
 
         $setting = $this->db->table('settings')->get()->getResultArray();
         $settingArr = [];
         foreach ($setting as $s) { $settingArr[$s['key']] = $s['value']; }
 
-        $taxRate     = ($settingArr['pajak'] ?? 0) / 100;
-        $serviceRate = ($settingArr['service_charge'] ?? 0) / 100;
-        $taxAmount   = round($subtotal * $taxRate);
+        $taxRate       = ($settingArr['pajak'] ?? 0) / 100;
+        $serviceRate   = ($settingArr['service_charge'] ?? 0) / 100;
+        $taxAmount     = round($subtotal * $taxRate);
         $serviceAmount = round($subtotal * $serviceRate);
-        $total       = $subtotal + $taxAmount + $serviceAmount;
+        $total         = $subtotal + $taxAmount + $serviceAmount;
 
         return view('kasir/pembayaran/index', [
             'title'         => 'Pembayaran Pesanan #' . $orderId,
@@ -107,8 +115,11 @@ class Pembayaran extends BaseController
         ]);
         $trxId = $this->db->insertID();
 
-        // Update order
+        // Update order jadi paid
         $this->db->table('orders')->where('id', $orderId)->update(['status' => 'paid']);
+
+        // Update semua order items jadi ready
+        $this->db->table('order_items')->where('order_id', $orderId)->update(['status' => 'ready']);
 
         // Bebaskan meja
         if ($order['table_id']) {
@@ -136,7 +147,10 @@ class Pembayaran extends BaseController
             ->get()->getRowArray();
 
         if (!$promo) {
-            return $this->response->setJSON(['valid' => false, 'message' => 'Kode promo tidak valid atau sudah kadaluarsa.']);
+            return $this->response->setJSON([
+                'valid'   => false,
+                'message' => 'Kode promo tidak valid atau sudah kadaluarsa.',
+            ]);
         }
 
         $diskon = 0;

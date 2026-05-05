@@ -15,32 +15,33 @@ class Dashboard extends BaseController
             ->select('o.*, t.number as table_number, u.name as kasir_name')
             ->join('tables t', 't.id = o.table_id', 'left')
             ->join('users u', 'u.id = o.waiter_id', 'left')
-            ->whereIn('o.status', ['open', 'process', 'ready'])
-            ->where('DATE(o.ordered_at)', $today)   // ← ganti whereDate
+            ->where('o.status', 'open')
             ->orderBy('o.ordered_at', 'DESC')
             ->get()->getResultArray();
 
-        $totalDiproses = $db->table('orders')
-            ->where('status', 'process')
-            ->where('DATE(ordered_at)', $today)      // ← ganti whereDate
-            ->countAllResults();
-
         $totalTransaksiHari = $db->table('transactions')
             ->where('status', 'paid')
-            ->where('DATE(paid_at)', $today)         // ← ganti whereDate
+            ->where('DATE(paid_at)', $today)
             ->countAllResults();
 
-        $pendapatanHari = $db->table('transactions')
+        $pendapatanRow = $db->table('transactions')
             ->selectSum('total')
             ->where('status', 'paid')
-            ->where('DATE(paid_at)', $today)         // ← ganti whereDate
-            ->get()->getRow()->total ?? 0;
+            ->where('DATE(paid_at)', $today)
+            ->get()->getRow();
+
+        $pendapatanHari = $pendapatanRow->total ?? 0;
+
+        $totalDibatalkan = $db->table('orders')
+            ->where('status', 'cancelled')
+            ->where('DATE(ordered_at)', $today)
+            ->countAllResults();
 
         return view('kasir/dashboard', [
             'title'              => 'Dashboard Kasir',
             'pesananAktif'       => $pesananAktif,
             'totalPesananAktif'  => count($pesananAktif),
-            'totalDiproses'      => $totalDiproses,
+            'totalDibatalkan'    => $totalDibatalkan,
             'totalTransaksiHari' => $totalTransaksiHari,
             'pendapatanHari'     => $pendapatanHari,
         ]);
