@@ -31,7 +31,7 @@
                     <label class="form-label">Role <span class="text-danger">*</span></label>
                     <select name="role" class="form-select" required>
                         <option value="">-- Pilih Role --</option>
-                        <?php foreach (['admin','waiter','kasir','dapur','owner'] as $r): ?>
+                        <?php foreach (['admin','kasir','dapur','owner'] as $r): ?>
                             <option value="<?= $r ?>" <?= old('role', $user['role'] ?? '') == $r ? 'selected' : '' ?>>
                                 <?= ucfirst($r) ?>
                             </option>
