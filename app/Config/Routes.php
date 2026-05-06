@@ -101,16 +101,28 @@ $routes->group('waiter', ['namespace' => 'App\Controllers\Waiter', 'filter' => '
     // ... tambah routes waiter di sini
 });
 
+// ─── DAPUR (KDS) ──────────────────────────────────────────────────────────────
+// Sesuai requirement: /dapur -> DapurController::index + AJAX update status
+$routes->get('dapur', 'DapurController::index', ['filter' => 'auth:dapur']);
+$routes->get('dapur/stok', 'DapurController::stok', ['filter' => 'auth:dapur']);
+$routes->get('dapur/resep', 'DapurController::resepList', ['filter' => 'auth:dapur']);
+$routes->post('dapur/updateStatus', 'DapurController::updateStatus', ['filter' => 'auth:dapur']);
+$routes->get('dapur/resep/(:num)', 'DapurController::resep/$1', ['filter' => 'auth:dapur']);
+
 // ─── DAPUR ───────────────────────────────────────────────────────────────────
-$routes->group('dapur', ['namespace' => 'App\Controllers\Dapur', 'filter' => 'auth:dapur'], function ($routes) {
-    $routes->get('dashboard', 'Dashboard::index');
-    // ... tambah routes dapur di sini
+$routes->group('dapur', ['namespace' => 'App\Controllers', 'filter' => 'auth:dapur'], function ($routes) {
+    $routes->get('dashboard', 'DapurController::index');
 });
 
+// ─── OWNER ────────────────────────────────────────────────────────────────────
+// Sesuai requirement: /owner -> OwnerController::index
+$routes->get('owner', 'OwnerController::index', ['filter' => 'auth:owner']);
+
 // ─── OWNER ───────────────────────────────────────────────────────────────────
-$routes->group('owner', ['namespace' => 'App\Controllers\Owner', 'filter' => 'auth:owner'], function ($routes) {
-    $routes->get('dashboard', 'Dashboard::index');
-    // ... tambah routes owner di sini
+$routes->group('owner', ['namespace' => 'App\Controllers', 'filter' => 'auth:owner'], function ($routes) {
+    $routes->get('dashboard', 'OwnerController::index');
+    $routes->get('export-penjualan', 'OwnerController::exportPenjualan');
+    $routes->get('stok-alert', 'OwnerController::stokAlert');
 });
 
 $routes->get('/generate-hash', 'Auth::generateHash');

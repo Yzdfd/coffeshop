@@ -118,9 +118,6 @@ class Pembayaran extends BaseController
         // Update order jadi paid
         $this->db->table('orders')->where('id', $orderId)->update(['status' => 'paid']);
 
-        // Update semua order items jadi ready
-        $this->db->table('order_items')->where('order_id', $orderId)->update(['status' => 'ready']);
-
         // Bebaskan meja
         if ($order['table_id']) {
             $this->db->table('tables')->where('id', $order['table_id'])->update([

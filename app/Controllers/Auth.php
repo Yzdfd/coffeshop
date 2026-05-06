@@ -72,8 +72,8 @@ class Auth extends BaseController
             'admin'  => redirect()->to(base_url('admin/dashboard')),
             'kasir'  => redirect()->to(base_url('kasir/dashboard')),
             'waiter' => redirect()->to(base_url('waiter/dashboard')),
-            'dapur'  => redirect()->to(base_url('dapur/dashboard')),
-            'owner'  => redirect()->to(base_url('owner/dashboard')),
+            'dapur'  => redirect()->to(base_url('dapur')),
+            'owner'  => redirect()->to(base_url('owner')),
             default  => redirect()->to(base_url('login'))
                             ->with('error', 'Role tidak dikenali. Hubungi admin.'),
         };

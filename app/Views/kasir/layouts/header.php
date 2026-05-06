@@ -15,37 +15,75 @@
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span class="fs-4">☕</span>
-            <span class="fw-bold ms-2">Kasir</span>
+            <span class="fw-bold ms-2"><?= esc($sidebarTitle ?? 'Kasir') ?></span>
         </div>
         <nav class="sidebar-nav">
-            <p class="nav-label">Pesanan</p>
-            <a href="<?= base_url('kasir/dashboard') ?>"
-               class="nav-item <?= strpos(current_url(), 'kasir/dashboard') !== false ? 'active' : '' ?>">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
-            </a>
-            <a href="<?= base_url('kasir/pesanan/buat') ?>"
-               class="nav-item <?= strpos(current_url(), 'kasir/pesanan/buat') !== false ? 'active' : '' ?>">
-                <i class="bi bi-plus-circle me-2"></i> Buat Pesanan
-            </a>
-            <a href="<?= base_url('kasir/pesanan') ?>"
-               class="nav-item <?= (strpos(current_url(), 'kasir/pesanan') !== false && strpos(current_url(), 'buat') === false) ? 'active' : '' ?>">
-                <i class="bi bi-list-check me-2"></i> Daftar Pesanan
-            </a>
+            <?php
+                $sidebarSections = $sidebarSections ?? [
+                    [
+                        'label' => 'Pesanan',
+                        'items' => [
+                            [
+                                'url'    => base_url('kasir/dashboard'),
+                                'active' => strpos(current_url(), 'kasir/dashboard') !== false,
+                                'icon'   => 'bi bi-speedometer2',
+                                'text'   => 'Dashboard',
+                            ],
+                            [
+                                'url'    => base_url('kasir/pesanan/buat'),
+                                'active' => strpos(current_url(), 'kasir/pesanan/buat') !== false,
+                                'icon'   => 'bi bi-plus-circle',
+                                'text'   => 'Buat Pesanan',
+                            ],
+                            [
+                                'url'    => base_url('kasir/pesanan'),
+                                'active' => (strpos(current_url(), 'kasir/pesanan') !== false && strpos(current_url(), 'buat') === false),
+                                'icon'   => 'bi bi-list-check',
+                                'text'   => 'Daftar Pesanan',
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => 'Keuangan',
+                        'items' => [
+                            [
+                                'url'    => base_url('kasir/pembayaran'),
+                                'active' => strpos(current_url(), 'kasir/pembayaran') !== false,
+                                'icon'   => 'bi bi-cash-coin',
+                                'text'   => 'Pembayaran',
+                            ],
+                            [
+                                'url'    => base_url('kasir/transaksi'),
+                                'active' => strpos(current_url(), 'kasir/transaksi') !== false,
+                                'icon'   => 'bi bi-receipt',
+                                'text'   => 'Transaksi Harian',
+                            ],
+                        ],
+                    ],
+                    [
+                        'label' => 'Akun',
+                        'items' => [
+                            [
+                                'url'    => base_url('logout'),
+                                'active' => false,
+                                'icon'   => 'bi bi-box-arrow-left',
+                                'text'   => 'Logout',
+                                'class'  => 'nav-logout',
+                            ],
+                        ],
+                    ],
+                ];
+            ?>
 
-            <p class="nav-label">Keuangan</p>
-            <a href="<?= base_url('kasir/pembayaran') ?>"
-               class="nav-item <?= strpos(current_url(), 'kasir/pembayaran') !== false ? 'active' : '' ?>">
-                <i class="bi bi-cash-coin me-2"></i> Pembayaran
-            </a>
-            <a href="<?= base_url('kasir/transaksi') ?>"
-               class="nav-item <?= strpos(current_url(), 'kasir/transaksi') !== false ? 'active' : '' ?>">
-                <i class="bi bi-receipt me-2"></i> Transaksi Harian
-            </a>
-
-            <p class="nav-label">Akun</p>
-            <a href="<?= base_url('logout') ?>" class="nav-item nav-logout">
-                <i class="bi bi-box-arrow-left me-2"></i> Logout
-            </a>
+            <?php foreach ($sidebarSections as $section): ?>
+                <p class="nav-label"><?= esc($section['label'] ?? '') ?></p>
+                <?php foreach (($section['items'] ?? []) as $item): ?>
+                    <a href="<?= esc($item['url'] ?? '#') ?>"
+                       class="nav-item <?= !empty($item['class']) ? esc($item['class']) : '' ?> <?= !empty($item['active']) ? 'active' : '' ?>">
+                        <i class="<?= esc($item['icon'] ?? '') ?> me-2"></i> <?= esc($item['text'] ?? '') ?>
+                    </a>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
         </nav>
     </div>
 
