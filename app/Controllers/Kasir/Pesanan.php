@@ -63,8 +63,14 @@ class Pesanan extends BaseController
 
     public function store()
     {
-        $tableId = $this->request->getPost('table_id') ?: null;
-        $notes   = $this->request->getPost('notes');
+         $nomorMeja = $this->request->getPost('table_id');
+         $notes     = $this->request->getPost('notes');
+
+        // Gabungkan nomor meja ke catatan, table_id dikosongkan
+        if ($nomorMeja) {
+        $notes = '[' . $nomorMeja . '] ' . $notes;
+        }
+        $tableId = null; // tidak pakai FK ke tabel tables
         $items   = json_decode($this->request->getPost('items'), true);
 
         if (empty($items)) {

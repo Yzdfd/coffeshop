@@ -49,7 +49,8 @@
                     <span><?= $order['table_id'] ? 'Meja ' . ($order['table_number'] ?? $order['table_id']) : 'Takeaway' ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
-                    <span>Waktu</span><span><?= date('d/m/Y H:i', strtotime($transaksi['paid_at'])) ?></span>
+                    <span>Waktu</span><span><?= (new DateTime($transaksi['paid_at'], 
+                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('d/m/Y H:i') ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
                     <span>Metode</span><span><?= strtoupper($transaksi['payment_method']) ?></span>
@@ -95,15 +96,19 @@
                     <span>TOTAL</span><span>Rp <?= number_format($transaksi['total'], 0, ',', '.') ?></span>
                 </div>
 
-                <?php if ($transaksi['payment_method'] == 'cash' && isset($transaksi['uang_diterima'])): ?>
-                <div class="d-flex justify-content-between small mt-1">
-                    <span>Uang Diterima</span><span>Rp <?= number_format($transaksi['uang_diterima'], 0, ',', '.') ?></span>
-                </div>
-                <div class="d-flex justify-content-between small">
-                    <span>Kembalian</span>
-                    <span>Rp <?= number_format($transaksi['uang_diterima'] - $transaksi['total'], 0, ',', '.') ?></span>
-                </div>
-                <?php endif; ?>
+                <?php 
+                    $uangDiterima = session()->getFlashdata('uang_diterima');
+                    $kembalian    = session()->getFlashdata('kembalian');
+                    if ($transaksi['payment_method'] == 'cash' && $uangDiterima): ?>
+                        <div class="d-flex justify-content-between small mt-1">
+                            <span>Uang Diterima</span>
+                            <span>Rp <?= number_format($uangDiterima, 0, ',', '.') ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between small">
+                            <span>Kembalian</span>
+                            <span>Rp <?= number_format(max(0, $kembalian), 0, ',', '.') ?></span>
+                        </div>
+                    <?php endif; ?>
 
                 <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
 

@@ -65,7 +65,7 @@
                     <div class="mb-3" id="cashInput">
                         <label class="form-label fw-semibold">Uang Diterima (Rp)</label>
                         <input type="number" name="uang_diterima" id="uangDiterima" class="form-control"
-                               placeholder="Masukkan jumlah uang..." oninput="hitungKembalian()">
+                             placeholder="Masukkan jumlah uang..." oninput="hitungKembalian()" min="0">
                         <div class="mt-2 p-2 bg-light rounded" id="kembalianBox" style="display:none">
                             <span class="text-muted">Kembalian:</span>
                             <span class="fw-bold text-success ms-2" id="kembalianText">Rp 0</span>
@@ -127,7 +127,18 @@ let diskonAmount = 0;
 // Sembunyikan input cash jika bukan cash
 document.querySelectorAll('input[name="payment_method"]').forEach(el => {
     el.addEventListener('change', function() {
-        document.getElementById('cashInput').style.display = this.value === 'cash' ? 'block' : 'none';
+        const isCash = this.value === 'cash';
+        document.getElementById('cashInput').style.display = isCash ? 'block' : 'none';
+        document.getElementById('uangDiterima').required = isCash;
+    });
+});
+// Set required saat halaman load (default cash)
+document.getElementById('uangDiterima').required = true;
+document.querySelectorAll('input[name="payment_method"]').forEach(el => {
+    el.addEventListener('change', function() {
+        const isCash = this.value === 'cash';
+        document.getElementById('cashInput').style.display = isCash ? 'block' : 'none';
+        document.getElementById('uangDiterima').required = isCash;
     });
 });
 

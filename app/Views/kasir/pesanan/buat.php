@@ -52,21 +52,31 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label small fw-semibold">Meja</label>
-                    <select class="form-select form-select-sm" id="pilihMeja">
-                        <option value="">Takeaway / Tanpa Meja</option>
-                        <?php foreach ($mejas as $meja): ?>
-                        <option value="<?= $meja['id'] ?>" <?= $meja['status'] != 'available' ? 'disabled' : '' ?>>
-                            Meja <?= $meja['number'] ?> <?= $meja['status'] != 'available' ? '(Terisi)' : '' ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label small fw-semibold">Catatan Order</label>
-                    <textarea class="form-control form-control-sm" id="catatanOrder" rows="2"
-                              placeholder="Contoh: tidak pedas, extra ice..."></textarea>
-                </div>
+    <label class="form-label small fw-semibold">Tipe Pesanan</label>
+    <div class="d-flex gap-2 mb-2">
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="tipePesanan" id="tipeDineIn" value="dinein" checked onchange="toggleTipe()">
+            <label class="form-check-label small" for="tipeDineIn">🪑 Dine In</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="tipePesanan" id="tipeTakeaway" value="takeaway" onchange="toggleTipe()">
+            <label class="form-check-label small" for="tipeTakeaway">🥡 Takeaway</label>
+        </div>
+    </div>
+
+    
+    <!-- Nomor Meja (Dine In) -->
+<div id="boxMeja">
+    <input type="text" class="form-control form-control-sm" id="pilihMeja"
+           placeholder="Contoh: Meja 1, Meja 2...">
+</div>
+
+    <!-- Nama / No. HP (Takeaway) -->
+    <div id="boxTakeaway" style="display:none">
+        <input type="text" class="form-control form-control-sm" id="catatanOrder"
+               placeholder="Nama pelanggan / No. HP...">
+    </div>
+</div>
                 <div id="orderItems" class="mb-3">
                     <p class="text-muted small text-center py-3">
                         <i class="bi bi-cart-x fs-4 d-block mb-1"></i>Belum ada item dipilih
@@ -149,14 +159,36 @@ function renderOrder() {
     document.getElementById('itemCountText').textContent = totalItem + ' item';
 }
 
-function clearOrder() { if (confirm('Kosongkan semua item?')) { orderItems = []; renderOrder(); } }
+    function clearOrder() { if (confirm('Kosongkan semua item?')) { orderItems = []; renderOrder(); } }
 
-function kirimPesanan() {
-    if (orderItems.length === 0) { alert('Tambahkan menu terlebih dahulu!'); return; }
-    document.getElementById('inputMeja').value    = document.getElementById('pilihMeja').value;
-    document.getElementById('inputCatatan').value = document.getElementById('catatanOrder').value;
-    document.getElementById('inputItems').value   = JSON.stringify(orderItems);
-    document.getElementById('formPesanan').submit();
+    function toggleTipe() {
+        const isDineIn = document.getElementById('tipeDineIn').checked;
+        document.getElementById('boxMeja').style.display     = isDineIn ? 'block' : 'none';
+        document.getElementById('boxTakeaway').style.display = isDineIn ? 'none'  : 'block';
+        document.getElementById('labelCatatan').textContent  = isDineIn ? 'Catatan Order' : 'Nama / Nomor HP Pelanggan';
+        document.getElementById('catatanOrder').placeholder  = isDineIn ? 'Contoh: tidak pedas, extra ice...' : 'Contoh: Budi / 0812xxxx';
+        if (!isDineIn) document.getElementById('pilihMeja').value = '';
+    }
+
+    function kirimPesanan() {
+        if (orderItems.length === 0) { alert('Tambahkan menu terlebih dahulu!'); return; }
+
+        const isDineIn = document.getElementById('tipeDineIn').checked;
+        const meja     = document.getElementById('pilihMeja').value;
+
+        if (isDineIn && !meja) { alert('Isi nomor meja terlebih dahulu!'); return; }
+
+        let catatan = document.getElementById('catatanOrder').value;
+        if (!isDineIn) {
+            const nama = document.getElementById('catatanOrder').value.trim();
+            if (!nama) { alert('Isi nama / nomor HP pelanggan untuk takeaway!'); return; }
+            catatan = '[Takeaway: ' + nama + '] ' + catatan;
+        }
+
+        document.getElementById('inputMeja').value    = meja;
+        document.getElementById('inputCatatan').value = catatan;
+        document.getElementById('inputItems').value   = JSON.stringify(orderItems);
+        document.getElementById('formPesanan').submit();
 }
 </script>
 

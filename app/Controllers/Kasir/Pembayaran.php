@@ -100,34 +100,43 @@ class Pembayaran extends BaseController
         $uangDiterima  = $this->request->getPost('uang_diterima') ?? 0;
         $promoId       = $this->request->getPost('promo_id') ?: null;
 
+
+
         // Simpan transaksi
-        $this->db->table('transactions')->insert([
-            'order_id'        => $orderId,
-            'kasir_id'        => session('user_id'),
-            'subtotal'        => $subtotal,
-            'tax_amount'      => $taxAmount,
-            'service_amount'  => $serviceAmount,
-            'discount_amount' => $diskon,
-            'total'           => $total,
-            'payment_method'  => $paymentMethod,
-            'status'          => 'paid',
-            'paid_at'         => date('Y-m-d H:i:s'),
-        ]);
-        $trxId = $this->db->insertID();
-
-        // Update order jadi paid
-        $this->db->table('orders')->where('id', $orderId)->update(['status' => 'paid']);
-
-        // Bebaskan meja
-        if ($order['table_id']) {
-            $this->db->table('tables')->where('id', $order['table_id'])->update([
-                'status'           => 'available',
-                'current_order_id' => null,
+                // 1. Simpan transaksi DULU
+            $this->db->table('transactions')->insert([
+                'order_id'        => $orderId,
+                'kasir_id'        => session('user_id'),
+                'subtotal'        => $subtotal,
+                'tax_amount'      => $taxAmount,
+                'service_amount'  => $serviceAmount,
+                'discount_amount' => $diskon,
+                'total'           => $total,
+                'payment_method'  => $paymentMethod,
+                'status'          => 'paid',
+                'paid_at'         => date('Y-m-d H:i:s'),
             ]);
-        }
+            $trxId = $this->db->insertID(); // 2. Ambil ID hasil insert
 
-        return redirect()->to(base_url('kasir/transaksi/struk/' . $trxId))
-            ->with('success', 'Pembayaran berhasil!');
+            // Update order jadi paid
+            $this->db->table('orders')->where('id', $orderId)->update(['status' => 'paid']);
+
+            // Bebaskan meja
+            if ($order['table_id']) {
+                $this->db->table('tables')->where('id', $order['table_id'])->update([
+                    'status'           => 'available',
+                    'current_order_id' => null,
+                ]);
+            }
+
+            // 3. Baru simpan session dan redirect
+            if ($paymentMethod === 'cash') {
+                session()->setFlashdata('uang_diterima', $uangDiterima);
+                session()->setFlashdata('kembalian', $uangDiterima - $total);
+            }
+
+            return redirect()->to(base_url('kasir/transaksi/struk/' . $trxId))
+                ->with('success', 'Pembayaran berhasil!');
     }
 
     // ─── CEK PROMO (AJAX) ─────────────────────────────────────
