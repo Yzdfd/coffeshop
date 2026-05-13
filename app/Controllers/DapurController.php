@@ -155,7 +155,7 @@ class DapurController extends BaseController
     public function resepList()
     {
         $menus = $this->db->table('menus')
-            ->where('status', 'active')
+            ->where('status', 'available')
             ->orderBy('name', 'ASC')
             ->get()->getResultArray();
 

@@ -1,0 +1,35 @@
+/* Shared UI polish across roles.
+ * Keep changes small to avoid breaking existing layouts.
+ */
+
+.card {
+    border-radius: 14px;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.table thead th {
+    font-weight: 600;
+}
+
+.badge {
+    border-radius: 999px;
+}
+
+.btn {
+    border-radius: 10px;
+}
+
+/* Improve mobile spacing a bit */
+@media (max-width: 576px) {
+    .p-4 {
+        padding: 1rem !important;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+}
+

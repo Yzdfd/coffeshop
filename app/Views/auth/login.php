@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — CaféSystem</title>
+    <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -471,6 +472,21 @@
         btn.innerHTML = '<span class="spinner"></span> Memverifikasi…';
     });
     </script>
+
+<?php
+$popupType = session()->getFlashdata('popup_type');
+$popupTitle = session()->getFlashdata('popup_title');
+$popupMsg = session()->getFlashdata('popup_message');
+?>
+<script src="<?= base_url('js/bootstrap.bundle.min.js') ?>"></script>
+<script src="<?= base_url('js/script.js') ?>"></script>
+<script>
+    window.CAFEF_POPUP = <?= json_encode([
+        'type' => $popupType ?? null,
+        'title' => $popupTitle ?? null,
+        'message' => $popupMsg ?? null,
+    ]) ?>;
+</script>
 
 </body>
 

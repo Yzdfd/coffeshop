@@ -7,6 +7,7 @@
     <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/bootstrap-icons.min.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/kasir.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
 </head>
 <body>
 <div class="d-flex" id="wrapper">

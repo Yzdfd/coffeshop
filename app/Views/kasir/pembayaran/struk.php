@@ -23,8 +23,9 @@
 <!-- STRUK -->
 <div class="row justify-content-center">
     <div class="col-md-4">
-        <div class="card border shadow-sm struk-area" id="struk" style="font-family: monospace; font-size: 13px;">
-            <div class="card-body p-4">
+        <?php $autoPrint = (int)($setting['auto_print_struk'] ?? 0); ?>
+        <div class="card border-0 struk-area" id="struk" style="font-family: monospace; font-size: 13px; max-width: 360px; margin: 0 auto;">
+            <div class="card-body p-3">
                 <!-- Header Struk -->
                 <div class="text-center mb-3">
                     <h5 class="fw-bold mb-0"><?= esc($setting['nama_cafe'] ?? 'Café') ?></h5>
@@ -36,7 +37,7 @@
                     <?php endif; ?>
                 </div>
 
-                <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+                <div style="border-top: 1px solid #000; margin: 8px 0;"></div>
 
                 <div class="d-flex justify-content-between small">
                     <span>No. Transaksi</span><span>#<?= $transaksi['id'] ?></span>
@@ -49,14 +50,18 @@
                     <span><?= $order['table_id'] ? 'Meja ' . ($order['table_number'] ?? $order['table_id']) : 'Takeaway' ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
-                    <span>Waktu</span><span><?= (new DateTime($transaksi['paid_at'], 
-                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('d/m/Y H:i') ?></span>
+                    <span>Tanggal</span><span><?= (new DateTime($transaksi['paid_at'],
+                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('d/m/Y') ?></span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                    <span>Waktu</span><span><?= (new DateTime($transaksi['paid_at'],
+                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('H:i') ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
                     <span>Metode</span><span><?= strtoupper($transaksi['payment_method']) ?></span>
                 </div>
 
-                <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+                <div style="border-top: 1px solid #000; margin: 8px 0;"></div>
 
                 <!-- Item -->
                 <?php foreach ($items as $item): ?>
@@ -69,16 +74,14 @@
                 </div>
                 <?php endforeach; ?>
 
-                <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+                <div style="border-top: 1px solid #000; margin: 8px 0;"></div>
 
                 <div class="d-flex justify-content-between small">
                     <span>Subtotal</span><span>Rp <?= number_format($transaksi['subtotal'], 0, ',', '.') ?></span>
                 </div>
-                <?php if ($transaksi['tax_amount'] > 0): ?>
                 <div class="d-flex justify-content-between small">
-                    <span>Pajak</span><span>Rp <?= number_format($transaksi['tax_amount'], 0, ',', '.') ?></span>
+                    <span>Pajak</span><span>Rp <?= number_format((float) ($transaksi['tax_amount'] ?? 0), 0, ',', '.') ?></span>
                 </div>
-                <?php endif; ?>
                 <?php if ($transaksi['service_amount'] > 0): ?>
                 <div class="d-flex justify-content-between small">
                     <span>Service</span><span>Rp <?= number_format($transaksi['service_amount'], 0, ',', '.') ?></span>
@@ -90,27 +93,30 @@
                 </div>
                 <?php endif; ?>
 
-                <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+                <div style="border-top: 1px solid #000; margin: 8px 0;"></div>
 
                 <div class="d-flex justify-content-between fw-bold">
                     <span>TOTAL</span><span>Rp <?= number_format($transaksi['total'], 0, ',', '.') ?></span>
                 </div>
 
-                <?php 
+                <?php
                     $uangDiterima = session()->getFlashdata('uang_diterima');
                     $kembalian    = session()->getFlashdata('kembalian');
-                    if ($transaksi['payment_method'] == 'cash' && $uangDiterima): ?>
-                        <div class="d-flex justify-content-between small mt-1">
-                            <span>Uang Diterima</span>
-                            <span>Rp <?= number_format($uangDiterima, 0, ',', '.') ?></span>
-                        </div>
-                        <div class="d-flex justify-content-between small">
-                            <span>Kembalian</span>
-                            <span>Rp <?= number_format(max(0, $kembalian), 0, ',', '.') ?></span>
-                        </div>
-                    <?php endif; ?>
+                    $isCash = ($transaksi['payment_method'] ?? '') === 'cash';
+                    $bayarAmount = $isCash ? (float) ($uangDiterima ?? 0) : (float) ($transaksi['total'] ?? 0);
+                ?>
+                <div class="d-flex justify-content-between small mt-1">
+                    <span>Bayar</span>
+                    <span>Rp <?= number_format($bayarAmount, 0, ',', '.') ?></span>
+                </div>
+                <?php if ($isCash): ?>
+                    <div class="d-flex justify-content-between small">
+                        <span>Kembalian</span>
+                        <span>Rp <?= number_format(max(0, (float)($kembalian ?? 0)), 0, ',', '.') ?></span>
+                    </div>
+                <?php endif; ?>
 
-                <div style="border-top: 1px dashed #000; margin: 8px 0;"></div>
+                <div style="border-top: 1px solid #000; margin: 8px 0;"></div>
 
                 <div class="text-center small text-muted">
                     <?= esc($setting['footer_struk'] ?? 'Terima kasih atas kunjungan Anda!') ?>
@@ -119,5 +125,21 @@
         </div>
     </div>
 </div>
+
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        body { margin: 0; }
+        .struk-area { border: 0 !important; box-shadow: none !important; }
+    }
+</style>
+
+<?php if ($autoPrint === 1): ?>
+<script>
+    window.addEventListener('load', function () {
+        window.print();
+    });
+</script>
+<?php endif; ?>
 
 <?= $this->include('kasir/layouts/footer') ?>

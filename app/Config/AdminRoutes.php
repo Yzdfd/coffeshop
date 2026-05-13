@@ -1,5 +1,9 @@
 <?php
 
+use CodeIgniter\Router\RouteCollection;
+
+/** @var RouteCollection $routes */
+
 // ============================================================
 // TAMBAHKAN KODE INI KE DALAM FILE: app/Config/Routes.php
 // Di dalam bagian $routes->group() atau langsung di bawah
@@ -20,6 +24,12 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin'], function ($rou
     $routes->get('menu/edit/(:num)',   'Menu::edit/$1');
     $routes->post('menu/update/(:num)','Menu::update/$1');
     $routes->get('menu/delete/(:num)', 'Menu::delete/$1');
+
+    // Resep Menu
+    $routes->get('resep',                      'Recipe::index');
+    $routes->get('resep/menu/(:num)',          'Recipe::manage/$1');
+    $routes->post('resep/store/(:num)',        'Recipe::store/$1');
+    $routes->post('resep/delete/(:num)',       'Recipe::delete/$1');
 
     // Kategori
     $routes->get('kategori',               'Kategori::index');

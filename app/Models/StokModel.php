@@ -13,9 +13,7 @@ class StokModel extends Model
         'supplier_id', 'name', 'stock_qty', 'min_stock', 'unit',
     ];
 
-    protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
+    protected $useTimestamps = false; // DB handles timestamps natively
 
     public function getStokRendah(): array
 {

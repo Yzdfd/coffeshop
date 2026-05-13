@@ -6,6 +6,7 @@
     <title><?= $title ?? 'Admin Panel' ?> - Café System</title>
     <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
     <link href="<?= base_url('css/bootstrap-icons.min.css') ?>" rel="stylesheet">
+    <link href="<?= base_url('css/style.css') ?>" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url('css/admin.css') ?>">
 </head>
 <body>
@@ -28,6 +29,10 @@
             <a href="<?= base_url('admin/menu') ?>"
                class="nav-item <?= strpos(current_url(), 'admin/menu') !== false ? 'active' : '' ?>">
                 <i class="bi bi-egg-fried me-2"></i> Menu
+            </a>
+            <a href="<?= base_url('admin/resep') ?>"
+               class="nav-item <?= strpos(current_url(), 'admin/resep') !== false ? 'active' : '' ?>">
+                <i class="bi bi-journal-text me-2"></i> Resep Menu
             </a>
             <a href="<?= base_url('admin/kategori') ?>"
                class="nav-item <?= strpos(current_url(), 'admin/kategori') !== false ? 'active' : '' ?>">

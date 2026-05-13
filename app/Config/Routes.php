@@ -28,6 +28,12 @@ $routes->group('admin', ['namespace' => 'App\Controllers\Admin', 'filter' => 'au
     $routes->post('menu/update/(:num)', 'Menu::update/$1');
     $routes->get('menu/delete/(:num)',  'Menu::delete/$1');
 
+    // ─── RESEP MENU ─────────────────────────────────────────
+    $routes->get('resep',                       'Recipe::index');
+    $routes->get('resep/menu/(:num)',         'Recipe::manage/$1');
+    $routes->post('resep/store/(:num)',       'Recipe::store/$1');
+    $routes->post('resep/delete/(:num)',      'Recipe::delete/$1');
+
     // ─── KATEGORI ────────────────────────────────────────────
     $routes->get('kategori',                'Kategori::index');
     $routes->post('kategori/store',         'Kategori::store');
@@ -121,8 +127,18 @@ $routes->get('owner', 'OwnerController::index', ['filter' => 'auth:owner']);
 // ─── OWNER ───────────────────────────────────────────────────────────────────
 $routes->group('owner', ['namespace' => 'App\Controllers', 'filter' => 'auth:owner'], function ($routes) {
     $routes->get('dashboard', 'OwnerController::index');
-    $routes->get('export-penjualan', 'OwnerController::exportPenjualan');
+    $routes->get('export-penjualan', 'Owner\Laporan::exportPenjualan');
     $routes->get('stok-alert', 'OwnerController::stokAlert');
+
+    // Kelola User (ROLE OWNER dapat semua role)
+    $routes->get('users', 'Owner\Users::index');
+    $routes->get('users/create', 'Owner\Users::create');
+    $routes->post('users/store', 'Owner\Users::store');
+    $routes->get('users/edit/(:num)', 'Owner\Users::edit/$1');
+    $routes->post('users/update/(:num)', 'Owner\Users::update/$1');
+    $routes->get('users/reset-password/(:num)', 'Owner\Users::resetPassword/$1');
+    $routes->get('users/delete/(:num)', 'Owner\Users::delete/$1');
+    $routes->get('users/toggle/(:num)', 'Owner\Users::toggle/$1');
 });
 
 $routes->get('/generate-hash', 'Auth::generateHash');

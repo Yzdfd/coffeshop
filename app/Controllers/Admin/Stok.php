@@ -4,14 +4,17 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\StokModel;
+use App\Models\StockLogModel;
 
 class Stok extends BaseController
 {
     protected $stokModel;
+    protected $stockLogModel;
 
     public function __construct()
     {
-        $this->stokModel = new StokModel();
+        $this->stokModel    = new StokModel();
+        $this->stockLogModel = new StockLogModel();
     }
 
     public function index()
@@ -67,12 +70,24 @@ class Stok extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
-        $this->stokModel->insert([
+        $id = $this->stokModel->insert([
             'name'      => $this->request->getPost('name'),
             'unit'      => $this->request->getPost('unit'),
             'stock_qty' => $this->request->getPost('stock_qty'),
             'min_stock' => $this->request->getPost('min_stock') ?? 5,
         ]);
+
+        // Catat log penambahan stok awal (jika > 0)
+        $jumlahAwal = (float) $this->request->getPost('stock_qty');
+        if ($id && $jumlahAwal > 0) {
+            $this->stockLogModel->insert([
+                'ingredient_id' => $id,
+                'order_id'      => null,
+                'qty_change'    => $jumlahAwal,
+                'reason'        => 'Input stok awal dari admin',
+                'logged_at'     => date('Y-m-d H:i:s'),
+            ]);
+        }
 
         return redirect()->to(base_url('admin/stok'))
             ->with('success', 'Bahan berhasil ditambahkan.');
@@ -131,14 +146,25 @@ class Stok extends BaseController
             return redirect()->to(base_url('admin/stok'))->with('error', 'Data tidak ditemukan.');
         }
 
-        if ($this->request->getMethod() === 'post') {
-            $jumlah = (float) $this->request->getPost('jumlah');
+        if (strtolower($this->request->getMethod()) === 'post') {
+            $jumlah     = (float) $this->request->getPost('jumlah');
+            $keterangan = (string) $this->request->getPost('keterangan');
+
             if ($jumlah <= 0) {
                 return redirect()->back()->with('error', 'Jumlah harus lebih dari 0.');
             }
 
-            $stokBaru = (float)$stok['stock_qty'] + $jumlah;
+            $stokBaru = (float) $stok['stock_qty'] + $jumlah;
             $this->stokModel->update($id, ['stock_qty' => $stokBaru]);
+
+            // Simpan log penambahan stok
+            $this->stockLogModel->insert([
+                'ingredient_id' => $id,
+                'order_id'      => null,
+                'qty_change'    => $jumlah,
+                'reason'        => $keterangan !== '' ? $keterangan : 'Tambah stok manual oleh admin',
+                'logged_at'     => date('Y-m-d H:i:s'),
+            ]);
 
             return redirect()->to(base_url('admin/stok'))
                 ->with('success', 'Stok berhasil ditambahkan sebanyak ' . $jumlah . ' ' . $stok['unit'] . '.');

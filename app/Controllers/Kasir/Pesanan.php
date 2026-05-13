@@ -155,7 +155,7 @@ class Pesanan extends BaseController
             return redirect()->to(base_url('kasir/pesanan'))->with('error', 'Pesanan tidak bisa diubah.');
         }
 
-        if ($this->request->getMethod() === 'post') {
+        if (strtolower($this->request->getMethod()) === 'post') {
             $items = json_decode($this->request->getPost('items'), true);
             if (!empty($items)) {
                 foreach ($items as $item) {

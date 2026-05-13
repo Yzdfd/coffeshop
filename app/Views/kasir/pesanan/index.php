@@ -19,9 +19,25 @@
         <h6 class="mb-0 fw-bold">Daftar Pesanan</h6>
         <small class="text-muted">Kelola semua pesanan aktif &amp; riwayat</small>
     </div>
-    <a href="<?= base_url('kasir/pesanan/buat') ?>" class="btn btn-success btn-sm px-3">
-        <i class="bi bi-plus-lg me-1"></i> Buat Pesanan
-    </a>
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <!-- Auto-refresh toggle -->
+        <span class="text-muted small me-1">Auto Refresh: <strong id="autoRefreshStatus">OFF</strong></span>
+        <button id="autoRefreshOn"  class="btn btn-outline-success btn-sm"><i class="bi bi-arrow-clockwise me-1"></i>ON</button>
+        <button id="autoRefreshOff" class="btn btn-outline-danger  btn-sm"><i class="bi bi-stop-circle  me-1"></i>OFF</button>
+        <a href="<?= base_url('kasir/pesanan/buat') ?>" class="btn btn-success btn-sm px-3">
+            <i class="bi bi-plus-lg me-1"></i> Buat Pesanan
+        </a>
+    </div>
+</div>
+
+<!-- Auto Refresh Toggle -->
+<div class="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
+    <span class="text-muted small">Auto Refresh:</span>
+    <button id="autoRefreshOn" type="button" class="btn btn-outline-success btn-sm">Auto Refresh ON</button>
+    <button id="autoRefreshOff" type="button" class="btn btn-outline-danger btn-sm">Auto Refresh OFF</button>
+    <span class="badge bg-light text-dark border">
+        Status: <span id="autoRefreshStatus">—</span>
+    </span>
 </div>
 
 <!-- Filter Bar -->

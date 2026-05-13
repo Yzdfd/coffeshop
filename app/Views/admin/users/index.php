@@ -24,7 +24,7 @@
                     placeholder="Cari nama / username...">
                 <select name="role" class="form-select form-select-sm" style="width:auto">
                     <option value="">Semua Role</option>
-                    <?php foreach (['admin','waiter','kasir','dapur','owner'] as $r): ?>
+                    <?php foreach (['waiter','kasir','dapur'] as $r): ?>
                     <option value="<?= $r ?>" <?= ($filterRole ?? '') == $r ? 'selected' : '' ?>>
                         <?= ucfirst($r) ?>
                     </option>
@@ -63,8 +63,6 @@
                         <td>
                             <?php
                             $roleColors = [
-                                'admin'  => 'bg-danger',
-                                'owner'  => 'bg-warning text-dark',
                                 'kasir'  => 'bg-info text-dark',
                                 'waiter' => 'bg-success',
                                 'dapur'  => 'bg-secondary',

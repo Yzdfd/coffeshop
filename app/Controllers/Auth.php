@@ -56,14 +56,29 @@ class Auth extends BaseController
             'shift'     => $user['shift'],
         ]);
 
+        // Popup login berhasil (untuk semua role)
+        $roleName = match ($user['role']) {
+            'admin'  => 'Admin',
+            'kasir'  => 'Kasir',
+            'waiter' => 'Waiter',
+            'dapur'  => 'Dapur',
+            'owner'  => 'Owner',
+            default  => ucfirst((string) $user['role']),
+        };
+        session()->setFlashdata('popup_type', 'success');
+        session()->setFlashdata('popup_title', 'Login berhasil');
+        session()->setFlashdata('popup_message', 'Selamat datang ' . $roleName . '!');
+
         return $this->redirectByRole($user['role']);
     }
 
     public function logout()
     {
         session()->destroy();
-        return redirect()->to(base_url('login'))
-            ->with('success', 'Anda berhasil keluar dari sistem.');
+        session()->setFlashdata('popup_type', 'success');
+        session()->setFlashdata('popup_title', 'Berhasil logout');
+        session()->setFlashdata('popup_message', 'Terima kasih, sampai jumpa!');
+        return redirect()->to(base_url('login'));
     }
 
     private function redirectByRole(string $role)

@@ -133,6 +133,17 @@ class OwnerController extends BaseController
                     ],
                 ],
                 [
+                    'label' => 'Manajemen',
+                    'items' => [
+                        [
+                            'url'    => base_url('owner/users'),
+                            'active' => (strpos(current_url(), 'owner/users') !== false),
+                            'icon'   => 'bi bi-people',
+                            'text'   => 'Kelola User',
+                        ],
+                    ],
+                ],
+                [
                     'label' => 'Akun',
                     'items' => [
                         [
@@ -161,13 +172,7 @@ class OwnerController extends BaseController
 
     public function stokAlert()
     {
-        $bahan = $this->db->table('ingredients i')
-            ->select('i.*, s.name as supplier_name')
-            ->join('suppliers s', 's.id = i.supplier_id', 'left')
-            ->where('i.stock_qty <=', $this->db->table('ingredients')->select('min_stock')->where('id = i.id')->getCompiledSelect())
-            ->get()->getResultArray();
-
-        // Alternatif query yang lebih sederhana
+        // Bahan di bawah stok minimum
         $bahan = $this->db->query("
             SELECT i.*, s.name as supplier_name 
             FROM ingredients i 
