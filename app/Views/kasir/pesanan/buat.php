@@ -81,7 +81,7 @@
                             placeholder="Nama pelanggan / No. HP...">
                     </div>
                 </div>
-                <div id="orderItems" class="mb-3">
+                <div id="orderItems" class="mb-3 order-items-scroll">
                     <p class="text-muted small text-center py-3">
                         <i class="bi bi-cart-x fs-4 d-block mb-1"></i>Belum ada item dipilih
                     </p>
