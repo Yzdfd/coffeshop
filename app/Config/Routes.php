@@ -98,6 +98,7 @@ $routes->group('kasir', ['namespace' => 'App\\Controllers\\Kasir', 'filter' => '
     // ─── TRANSAKSI ───────────────────────────────────────────
     $routes->get('transaksi',                     'Transaksi::index');
     $routes->get('transaksi/struk/(:num)',        'Transaksi::struk/$1');
+    $routes->get('transaksi/print/(:num)', 'Transaksi::printStruk/$1');
     $routes->get('transaksi/void/(:num)',         'Transaksi::void/$1');
 });
 

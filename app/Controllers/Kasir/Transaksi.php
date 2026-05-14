@@ -28,7 +28,8 @@ class Transaksi extends BaseController
 
         $totalPendapatan = array_sum(array_column($transaksis, 'total'));
         $totalCash = array_sum(array_map(
-            fn($t) => $t['payment_method'] === 'cash' ? $t['total'] : 0, $transaksis
+            fn($t) => $t['payment_method'] === 'cash' ? $t['total'] : 0,
+            $transaksis
         ));
         $totalNonCash = $totalPendapatan - $totalCash;
 
@@ -43,8 +44,34 @@ class Transaksi extends BaseController
         ]);
     }
 
-    // ─── CETAK STRUK ──────────────────────────────────────────
+    // ─── VIEW STRUK ───────────────────────────────────────────
     public function struk($id)
+    {
+        $data = $this->getStrukData($id);
+
+        if (!$data) {
+            return redirect()->to(base_url('kasir/transaksi'))
+                ->with('error', 'Transaksi tidak ditemukan.');
+        }
+
+        return view('kasir/pembayaran/struk', $data);
+    }
+
+    // ─── PRINT STRUK KHUSUS ───────────────────────────────────
+    public function printStruk($id)
+    {
+        $data = $this->getStrukData($id);
+
+        if (!$data) {
+            return redirect()->to(base_url('kasir/transaksi'))
+                ->with('error', 'Transaksi tidak ditemukan.');
+        }
+
+        return view('kasir/pembayaran/print_struk', $data);
+    }
+
+    // ─── AMBIL DATA STRUK ─────────────────────────────────────
+    private function getStrukData($id)
     {
         $transaksi = $this->db->table('transactions t')
             ->select('t.*, u.name as kasir_name')
@@ -53,7 +80,7 @@ class Transaksi extends BaseController
             ->get()->getRowArray();
 
         if (!$transaksi) {
-            return redirect()->to(base_url('kasir/transaksi'))->with('error', 'Transaksi tidak ditemukan.');
+            return null;
         }
 
         $order = $this->db->table('orders o')
@@ -70,28 +97,42 @@ class Transaksi extends BaseController
             ->get()->getResultArray();
 
         $setting = $this->db->table('settings')->get()->getResultArray();
-        $settingArr = [];
-        foreach ($setting as $s) { $settingArr[$s['key']] = $s['value']; }
 
-        return view('kasir/pembayaran/struk', [
+        $settingArr = [];
+
+        foreach ($setting as $s) {
+            $settingArr[$s['key']] = $s['value'];
+        }
+
+        return [
             'title'     => 'Struk #' . $id,
             'transaksi' => $transaksi,
             'order'     => $order,
             'items'     => $items,
             'setting'   => $settingArr,
-        ]);
+        ];
     }
 
     // ─── VOID / REFUND ────────────────────────────────────────
     public function void($id)
     {
-        $transaksi = $this->db->table('transactions')->where('id', $id)->get()->getRowArray();
+        $transaksi = $this->db->table('transactions')
+            ->where('id', $id)
+            ->get()
+            ->getRowArray();
+
         if (!$transaksi) {
-            return redirect()->to(base_url('kasir/transaksi'))->with('error', 'Transaksi tidak ditemukan.');
+            return redirect()->to(base_url('kasir/transaksi'))
+                ->with('error', 'Transaksi tidak ditemukan.');
         }
 
-        $this->db->table('transactions')->where('id', $id)->update(['status' => 'void']);
-        $this->db->table('orders')->where('id', $transaksi['order_id'])->update(['status' => 'cancelled']);
+        $this->db->table('transactions')
+            ->where('id', $id)
+            ->update(['status' => 'void']);
+
+        $this->db->table('orders')
+            ->where('id', $transaksi['order_id'])
+            ->update(['status' => 'cancelled']);
 
         return redirect()->to(base_url('kasir/transaksi'))
             ->with('success', 'Transaksi #' . $id . ' berhasil di-void.');

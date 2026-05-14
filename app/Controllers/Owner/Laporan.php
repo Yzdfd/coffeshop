@@ -28,6 +28,8 @@ class Laporan extends BaseController
         $filename = 'laporan_penjualan_' . $startDate . '_sd_' . $endDate . '.csv';
 
         $handle = fopen('php://temp', 'r+');
+
+        // HEADER CSV
         fputcsv($handle, [
             'TRX',
             'Tanggal Bayar',
@@ -35,39 +37,69 @@ class Laporan extends BaseController
             'Meja',
             'Metode Bayar',
             'Menu Dibeli',
-            'Qty',
-            'Subtotal Item',
+            'Total Qty',
             'Total Transaksi',
         ]);
 
-        foreach ($rows as $r) {
-            $trxCode = 'TRX' . str_pad((string) ((int) ($r['transaksi_id'] ?? 0)), 3, '0', STR_PAD_LEFT);
+        // GROUPING TRANSAKSI
+        $grouped = [];
 
-            $tableName = ! empty($r['table_number'])
-                ? 'Meja ' . $r['table_number']
-                : 'Takeaway';
+        foreach ($rows as $r) {
+
+            $trxId = $r['transaksi_id'];
+
+            // kalau transaksi belum ada
+            if (!isset($grouped[$trxId])) {
+
+                $grouped[$trxId] = [
+                    'trx'            => 'TRX' . str_pad((string)$trxId, 3, '0', STR_PAD_LEFT),
+                    'paid_at'        => $r['paid_at'] ?? '',
+                    'kasir_name'     => $r['kasir_name'] ?? '-',
+                    'table_name'     => !empty($r['table_number'])
+                        ? 'Meja ' . $r['table_number']
+                        : 'Takeaway',
+                    'payment_method' => $r['payment_method'] ?? '-',
+                    'menus'          => [],
+                    'total_qty'      => 0,
+                    'trx_total'      => $r['trx_total'] ?? 0,
+                ];
+            }
+
+            // gabung menu
+            $grouped[$trxId]['menus'][] =
+                ($r['menu_name'] ?? '-') . ' x' . ($r['qty'] ?? 0);
+
+            // total qty
+            $grouped[$trxId]['total_qty'] += (int)($r['qty'] ?? 0);
+        }
+
+        // EXPORT KE CSV
+        foreach ($grouped as $g) {
 
             fputcsv($handle, [
-                $trxCode,
-                (string) ($r['paid_at'] ?? ''),
-                (string) ($r['kasir_name'] ?? '-'),
-                (string) $tableName,
-                (string) ($r['payment_method'] ?? '-'),
-                (string) ($r['menu_name'] ?? '-'),
-                (int) ($r['qty'] ?? 0),
-                (float) ($r['item_subtotal'] ?? 0),
-                (float) ($r['trx_total'] ?? 0),
+                $g['trx'],
+                $g['paid_at'],
+                $g['kasir_name'],
+                $g['table_name'],
+                $g['payment_method'],
+                implode(' | ', $g['menus']),
+                $g['total_qty'],
+                $g['trx_total'],
             ]);
         }
 
         rewind($handle);
+
         $csv = stream_get_contents($handle);
+
         fclose($handle);
 
         return $this->response
             ->setHeader('Content-Type', 'text/csv; charset=UTF-8')
-            ->setHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+            ->setHeader(
+                'Content-Disposition',
+                'attachment; filename="' . $filename . '"'
+            )
             ->setBody($csv ?: '');
     }
 }
-
