@@ -29,58 +29,24 @@ class UserSeeder extends Seeder
             ],
             [
                 'name'          => 'Kasir Satu',
-                'username'      => 'kasir1',
+                'username'      => 'kasir',
                 'password_hash' => password_hash('kasir123', PASSWORD_DEFAULT),
                 'role'          => 'kasir',
                 'shift'         => 'pagi',
                 'status'        => 'aktif',
                 'created_at'    => date('Y-m-d H:i:s'),
             ],
-            [
-                'name'          => 'Kasir Dua',
-                'username'      => 'kasir2',
-                'password_hash' => password_hash('kasir123', PASSWORD_DEFAULT),
-                'role'          => 'kasir',
-                'shift'         => 'sore',
-                'status'        => 'aktif',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
-            [
-                'name'          => 'Waiter Satu',
-                'username'      => 'waiter1',
-                'password_hash' => password_hash('waiter123', PASSWORD_DEFAULT),
-                'role'          => 'waiter',
-                'shift'         => 'pagi',
-                'status'        => 'aktif',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
-            [
-                'name'          => 'Waiter Dua',
-                'username'      => 'waiter2',
-                'password_hash' => password_hash('waiter123', PASSWORD_DEFAULT),
-                'role'          => 'waiter',
-                'shift'         => 'sore',
-                'status'        => 'aktif',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
+
             [
                 'name'          => 'Tim Dapur Satu',
-                'username'      => 'dapur1',
+                'username'      => 'dapur',
                 'password_hash' => password_hash('dapur123', PASSWORD_DEFAULT),
                 'role'          => 'dapur',
                 'shift'         => 'pagi',
                 'status'        => 'aktif',
                 'created_at'    => date('Y-m-d H:i:s'),
             ],
-            [
-                'name'          => 'Tim Dapur Dua',
-                'username'      => 'dapur2',
-                'password_hash' => password_hash('dapur123', PASSWORD_DEFAULT),
-                'role'          => 'dapur',
-                'shift'         => 'sore',
-                'status'        => 'aktif',
-                'created_at'    => date('Y-m-d H:i:s'),
-            ],
+
         ];
 
         // Hindari duplikasi jika seeder dijalankan ulang

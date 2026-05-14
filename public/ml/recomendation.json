@@ -1,0 +1,542 @@
+[
+    {
+        "antecedents": [
+            "Caramel Latte"
+        ],
+        "consequents": [
+            "Matcha Bun"
+        ],
+        "confidence": 0.1962025316455696,
+        "lift": 1.2036965131630037
+    },
+    {
+        "antecedents": [
+            "Matcha Bun"
+        ],
+        "consequents": [
+            "Caramel Latte"
+        ],
+        "confidence": 0.19018404907975459,
+        "lift": 1.2036965131630037
+    },
+    {
+        "antecedents": [
+            "Creamy Aren Latte"
+        ],
+        "consequents": [
+            "Fries"
+        ],
+        "confidence": 0.20731707317073172,
+        "lift": 1.1846689895470386
+    },
+    {
+        "antecedents": [
+            "Fries"
+        ],
+        "consequents": [
+            "Creamy Aren Latte"
+        ],
+        "confidence": 0.1942857142857143,
+        "lift": 1.1846689895470384
+    },
+    {
+        "antecedents": [
+            "Americano"
+        ],
+        "consequents": [
+            "Cookies"
+        ],
+        "confidence": 0.1834319526627219,
+        "lift": 1.1683563863867636
+    },
+    {
+        "antecedents": [
+            "Cookies"
+        ],
+        "consequents": [
+            "Americano"
+        ],
+        "confidence": 0.19745222929936304,
+        "lift": 1.1683563863867634
+    },
+    {
+        "antecedents": [
+            "Americano"
+        ],
+        "consequents": [
+            "Cheese Toast"
+        ],
+        "confidence": 0.20118343195266272,
+        "lift": 1.1629100112870678
+    },
+    {
+        "antecedents": [
+            "Cheese Toast"
+        ],
+        "consequents": [
+            "Americano"
+        ],
+        "confidence": 0.1965317919075145,
+        "lift": 1.1629100112870678
+    },
+    {
+        "antecedents": [
+            "Latte"
+        ],
+        "consequents": [
+            "Matcha Bun"
+        ],
+        "confidence": 0.18840579710144925,
+        "lift": 1.1558637858984617
+    },
+    {
+        "antecedents": [
+            "Matcha Bun"
+        ],
+        "consequents": [
+            "Latte"
+        ],
+        "confidence": 0.15950920245398773,
+        "lift": 1.1558637858984617
+    },
+    {
+        "antecedents": [
+            "Vanilla Latte"
+        ],
+        "consequents": [
+            "Egg Salad Toast"
+        ],
+        "confidence": 0.1946308724832215,
+        "lift": 1.1516619673563402
+    },
+    {
+        "antecedents": [
+            "Egg Salad Toast"
+        ],
+        "consequents": [
+            "Vanilla Latte"
+        ],
+        "confidence": 0.17159763313609466,
+        "lift": 1.15166196735634
+    },
+    {
+        "antecedents": [
+            "Americano"
+        ],
+        "consequents": [
+            "Fries"
+        ],
+        "confidence": 0.20118343195266272,
+        "lift": 1.1496196111580728
+    },
+    {
+        "antecedents": [
+            "Fries"
+        ],
+        "consequents": [
+            "Americano"
+        ],
+        "confidence": 0.1942857142857143,
+        "lift": 1.1496196111580728
+    },
+    {
+        "antecedents": [
+            "Caramel Macchiato"
+        ],
+        "consequents": [
+            "Cookies"
+        ],
+        "confidence": 0.17919075144508673,
+        "lift": 1.1413423658922721
+    },
+    {
+        "antecedents": [
+            "Cookies"
+        ],
+        "consequents": [
+            "Caramel Macchiato"
+        ],
+        "confidence": 0.19745222929936304,
+        "lift": 1.141342365892272
+    },
+    {
+        "antecedents": [
+            "Caramel Macchiato"
+        ],
+        "consequents": [
+            "Cheese Toast"
+        ],
+        "confidence": 0.1965317919075145,
+        "lift": 1.1360219185405462
+    },
+    {
+        "antecedents": [
+            "Cheese Toast"
+        ],
+        "consequents": [
+            "Caramel Macchiato"
+        ],
+        "confidence": 0.1965317919075145,
+        "lift": 1.1360219185405462
+    },
+    {
+        "antecedents": [
+            "Caramel Macchiato"
+        ],
+        "consequents": [
+            "Croissant"
+        ],
+        "confidence": 0.1965317919075145,
+        "lift": 1.1166579085654234
+    },
+    {
+        "antecedents": [
+            "Croissant"
+        ],
+        "consequents": [
+            "Caramel Macchiato"
+        ],
+        "confidence": 0.1931818181818182,
+        "lift": 1.1166579085654231
+    },
+    {
+        "antecedents": [
+            "Butter Toast"
+        ],
+        "consequents": [
+            "Cappuccino"
+        ],
+        "confidence": 0.18471337579617836,
+        "lift": 1.10606811853999
+    },
+    {
+        "antecedents": [
+            "Cappuccino"
+        ],
+        "consequents": [
+            "Butter Toast"
+        ],
+        "confidence": 0.17365269461077845,
+        "lift": 1.10606811853999
+    },
+    {
+        "antecedents": [
+            "Cappuccino"
+        ],
+        "consequents": [
+            "Croissant"
+        ],
+        "confidence": 0.19161676646706585,
+        "lift": 1.0887316276537833
+    },
+    {
+        "antecedents": [
+            "Croissant"
+        ],
+        "consequents": [
+            "Cappuccino"
+        ],
+        "confidence": 0.18181818181818182,
+        "lift": 1.0887316276537833
+    },
+    {
+        "antecedents": [
+            "Cookies"
+        ],
+        "consequents": [
+            "Creamy Aren Latte"
+        ],
+        "confidence": 0.178343949044586,
+        "lift": 1.0874631039304024
+    },
+    {
+        "antecedents": [
+            "Creamy Aren Latte"
+        ],
+        "consequents": [
+            "Cookies"
+        ],
+        "confidence": 0.17073170731707316,
+        "lift": 1.0874631039304024
+    },
+    {
+        "antecedents": [
+            "Caramel Latte"
+        ],
+        "consequents": [
+            "Egg Salad Toast"
+        ],
+        "confidence": 0.18354430379746836,
+        "lift": 1.086060969215789
+    },
+    {
+        "antecedents": [
+            "Egg Salad Toast"
+        ],
+        "consequents": [
+            "Caramel Latte"
+        ],
+        "confidence": 0.17159763313609466,
+        "lift": 1.086060969215789
+    },
+    {
+        "antecedents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "consequents": [
+            "Hazelnut Latte"
+        ],
+        "confidence": 0.18633540372670807,
+        "lift": 1.077083258535885
+    },
+    {
+        "antecedents": [
+            "Hazelnut Latte"
+        ],
+        "consequents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "confidence": 0.17341040462427745,
+        "lift": 1.0770832585358847
+    },
+    {
+        "antecedents": [
+            "Latte"
+        ],
+        "consequents": [
+            "Fries"
+        ],
+        "confidence": 0.18840579710144925,
+        "lift": 1.0766045548654244
+    },
+    {
+        "antecedents": [
+            "Fries"
+        ],
+        "consequents": [
+            "Latte"
+        ],
+        "confidence": 0.14857142857142858,
+        "lift": 1.0766045548654244
+    },
+    {
+        "antecedents": [
+            "Hazelnut Latte"
+        ],
+        "consequents": [
+            "Cheese Toast"
+        ],
+        "confidence": 0.18497109826589597,
+        "lift": 1.069197099802867
+    },
+    {
+        "antecedents": [
+            "Cheese Toast"
+        ],
+        "consequents": [
+            "Hazelnut Latte"
+        ],
+        "confidence": 0.18497109826589597,
+        "lift": 1.069197099802867
+    },
+    {
+        "antecedents": [
+            "Matcha Latte"
+        ],
+        "consequents": [
+            "Chocolate Toast"
+        ],
+        "confidence": 0.1834319526627219,
+        "lift": 1.0664648410623367
+    },
+    {
+        "antecedents": [
+            "Chocolate Toast"
+        ],
+        "consequents": [
+            "Matcha Latte"
+        ],
+        "confidence": 0.1802325581395349,
+        "lift": 1.0664648410623365
+    },
+    {
+        "antecedents": [
+            "Caramel Latte"
+        ],
+        "consequents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "confidence": 0.17088607594936708,
+        "lift": 1.0614041984432738
+    },
+    {
+        "antecedents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "consequents": [
+            "Caramel Latte"
+        ],
+        "confidence": 0.16770186335403725,
+        "lift": 1.0614041984432738
+    },
+    {
+        "antecedents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "consequents": [
+            "Creamy Aren Latte"
+        ],
+        "confidence": 0.17391304347826086,
+        "lift": 1.0604453870625663
+    },
+    {
+        "antecedents": [
+            "Creamy Aren Latte"
+        ],
+        "consequents": [
+            "Crispy Chicken Nuggets"
+        ],
+        "confidence": 0.17073170731707316,
+        "lift": 1.060445387062566
+    },
+    {
+        "antecedents": [
+            "Matcha Latte"
+        ],
+        "consequents": [
+            "Cheese Toast"
+        ],
+        "confidence": 0.1834319526627219,
+        "lift": 1.060300304408797
+    },
+    {
+        "antecedents": [
+            "Cheese Toast"
+        ],
+        "consequents": [
+            "Matcha Latte"
+        ],
+        "confidence": 0.17919075144508673,
+        "lift": 1.060300304408797
+    },
+    {
+        "antecedents": [
+            "Vanilla Latte"
+        ],
+        "consequents": [
+            "Cheese Toast"
+        ],
+        "confidence": 0.18120805369127518,
+        "lift": 1.0474453970593942
+    },
+    {
+        "antecedents": [
+            "Cheese Toast"
+        ],
+        "consequents": [
+            "Vanilla Latte"
+        ],
+        "confidence": 0.15606936416184972,
+        "lift": 1.0474453970593942
+    },
+    {
+        "antecedents": [
+            "Matcha Bun"
+        ],
+        "consequents": [
+            "Creamy Aren Latte"
+        ],
+        "confidence": 0.17177914110429449,
+        "lift": 1.0474337872213078
+    },
+    {
+        "antecedents": [
+            "Creamy Aren Latte"
+        ],
+        "consequents": [
+            "Matcha Bun"
+        ],
+        "confidence": 0.17073170731707316,
+        "lift": 1.0474337872213078
+    },
+    {
+        "antecedents": [
+            "Cappuccino"
+        ],
+        "consequents": [
+            "Chocolate Toast"
+        ],
+        "confidence": 0.17964071856287422,
+        "lift": 1.044422782342292
+    },
+    {
+        "antecedents": [
+            "Chocolate Toast"
+        ],
+        "consequents": [
+            "Cappuccino"
+        ],
+        "confidence": 0.1744186046511628,
+        "lift": 1.044422782342292
+    },
+    {
+        "antecedents": [
+            "Latte"
+        ],
+        "consequents": [
+            "Egg Salad Toast"
+        ],
+        "confidence": 0.17391304347826086,
+        "lift": 1.0290712631849754
+    },
+    {
+        "antecedents": [
+            "Egg Salad Toast"
+        ],
+        "consequents": [
+            "Latte"
+        ],
+        "confidence": 0.14201183431952663,
+        "lift": 1.0290712631849754
+    },
+    {
+        "antecedents": [
+            "Butter Toast"
+        ],
+        "consequents": [
+            "Matcha Latte"
+        ],
+        "confidence": 0.17197452229299362,
+        "lift": 1.0176007236271811
+    },
+    {
+        "antecedents": [
+            "Matcha Latte"
+        ],
+        "consequents": [
+            "Butter Toast"
+        ],
+        "confidence": 0.15976331360946744,
+        "lift": 1.0176007236271811
+    },
+    {
+        "antecedents": [
+            "Caramel Latte"
+        ],
+        "consequents": [
+            "Fries"
+        ],
+        "confidence": 0.17721518987341772,
+        "lift": 1.0126582278481013
+    },
+    {
+        "antecedents": [
+            "Fries"
+        ],
+        "consequents": [
+            "Caramel Latte"
+        ],
+        "confidence": 0.16,
+        "lift": 1.0126582278481013
+    }
+]
