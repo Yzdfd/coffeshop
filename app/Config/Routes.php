@@ -88,6 +88,7 @@ $routes->group('kasir', ['namespace' => 'App\\Controllers\\Kasir', 'filter' => '
     $routes->get('pesanan/detail/(:num)',         'Pesanan::detail/$1');
     $routes->match(['get','post'], 'pesanan/tambah-item/(:num)', 'Pesanan::tambahItem/$1');
     $routes->get('pesanan/cancel/(:num)',         'Pesanan::cancel/$1');
+    $routes->get('pesanan/menus', 'Pesanan::menus');
 
     // ─── PEMBAYARAN ──────────────────────────────────────────
     $routes->get('pembayaran',                    'Pembayaran::index');
@@ -100,6 +101,8 @@ $routes->group('kasir', ['namespace' => 'App\\Controllers\\Kasir', 'filter' => '
     $routes->get('transaksi/struk/(:num)',        'Transaksi::struk/$1');
     $routes->get('transaksi/print/(:num)', 'Transaksi::printStruk/$1');
     $routes->get('transaksi/void/(:num)',         'Transaksi::void/$1');
+
+    
 });
 
 // ─── WAITER ──────────────────────────────────────────────────────────────────
