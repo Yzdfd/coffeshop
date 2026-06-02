@@ -6,16 +6,21 @@ use CodeIgniter\Model;
 
 class UserModel extends Model
 {
-    protected $table      = 'users';
+    protected $table = 'users';
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'name', 'username', 'password_hash', 'role', 'shift', 'status',
+        'name',
+        'username',
+        'password_hash',
+        'role',
+        'shift',
+        'status',
     ];
 
     protected $useTimestamps = true;
-    protected $createdField  = 'created_at';
-    protected $updatedField  = '';
+    protected $createdField = 'created_at';
+    protected $updatedField = '';
 
     // Jangan expose password_hash di response biasa
     protected $hidden = ['password_hash'];
@@ -27,8 +32,31 @@ class UserModel extends Model
     public function findForLogin(string $username): ?array
     {
         return $this->select('id, name, username, password_hash, role, shift, status')
-                    ->where('username', $username)
-                    ->where('status', 'aktif')
-                    ->first();
+            ->where('username', $username)
+            ->where('status', 'aktif')
+            ->first();
+    }
+
+    public function isUsed(int $userId): bool
+    {
+        $orderCount = $this->db->table('orders')
+            ->where('waiter_id', $userId)
+            ->countAllResults();
+
+        if ($orderCount > 0) {
+            return true;
+        }
+
+        if ($this->db->tableExists('transactions')) {
+            $transactionCount = $this->db->table('transactions')
+                ->where('kasir_id', $userId)
+                ->countAllResults();
+
+            if ($transactionCount > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

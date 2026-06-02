@@ -17,10 +17,10 @@ class Kategori extends BaseController
     public function index()
     {
         $data = [
-            'title'      => 'Kelola Kategori',
-            'kategoris'  => $this->kategoriModel->getKategoriWithCount(),
+            'title' => 'Kelola Kategori',
+            'kategoris' => $this->kategoriModel->getKategoriWithCount(),
             'formAction' => base_url('admin/kategori/store'),
-            'errors'     => [],
+            'errors' => [],
         ];
 
         return view('admin/kategori/index', $data);
@@ -32,15 +32,15 @@ class Kategori extends BaseController
             'name' => 'required|min_length[2]|max_length[100]|is_unique[categories.name]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->kategoriModel->insert([
-            'name'        => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
-            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
+            'sort_order' => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))
@@ -50,16 +50,16 @@ class Kategori extends BaseController
     public function edit($id)
     {
         $kategori = $this->kategoriModel->find($id);
-        if (! $kategori) {
+        if (!$kategori) {
             return redirect()->to(base_url('admin/kategori'))->with('error', 'Kategori tidak ditemukan.');
         }
 
         $data = [
-            'title'        => 'Edit Kategori',
-            'kategoris'    => $this->kategoriModel->getKategoriWithCount(),
+            'title' => 'Edit Kategori',
+            'kategoris' => $this->kategoriModel->getKategoriWithCount(),
             'editKategori' => $kategori,
-            'formAction'   => base_url('admin/kategori/update/' . $id),
-            'errors'       => [],
+            'formAction' => base_url('admin/kategori/update/' . $id),
+            'errors' => [],
         ];
 
         return view('admin/kategori/index', $data);
@@ -71,15 +71,15 @@ class Kategori extends BaseController
             'name' => "required|min_length[2]|max_length[100]|is_unique[categories.name,id,{$id}]",
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->kategoriModel->update($id, [
-            'name'        => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'description' => $this->request->getPost('description'),
-            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
+            'sort_order' => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))
@@ -91,10 +91,15 @@ class Kategori extends BaseController
         $jumlah = $this->kategoriModel->countMenuByKategori($id);
         if ($jumlah > 0) {
             return redirect()->to(base_url('admin/kategori'))
-                ->with('error', 'Kategori tidak bisa dihapus, masih digunakan oleh ' . $jumlah . ' menu.');
+                ->with('error', 'Kategori tidak bisa dihapus karena masih digunakan oleh ' . $jumlah . ' menu.');
         }
 
-        $this->kategoriModel->delete($id);
+        try {
+            $this->kategoriModel->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('admin/kategori'))
+                ->with('error', 'Kategori tidak bisa dihapus karena masih terhubung dengan data lain.');
+        }
 
         return redirect()->to(base_url('admin/kategori'))
             ->with('success', 'Kategori berhasil dihapus.');

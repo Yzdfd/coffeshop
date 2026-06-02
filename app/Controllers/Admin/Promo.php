@@ -3,14 +3,17 @@
 namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
+use App\Models\PromoModel;
 
 class Promo extends BaseController
 {
     protected $db;
+    protected $promoModel;
 
     public function __construct()
     {
         $this->db = \Config\Database::connect();
+        $this->promoModel = new PromoModel();
     }
 
     // ─── INDEX ───────────────────────────────────────────────
@@ -25,8 +28,8 @@ class Promo extends BaseController
         }
 
         return view('admin/promo/index', [
-            'title'        => 'Kelola Promo',
-            'promos'       => $builder->get()->getResultArray(),
+            'title' => 'Kelola Promo',
+            'promos' => $builder->get()->getResultArray(),
             'filterStatus' => $filterStatus,
         ]);
     }
@@ -35,20 +38,20 @@ class Promo extends BaseController
     public function create()
     {
         return view('admin/promo/form', [
-            'title'      => 'Tambah Promo',
+            'title' => 'Tambah Promo',
             'formAction' => base_url('admin/promo/store'),
-            'promo'      => [],
-            'errors'     => [],
+            'promo' => [],
+            'errors' => [],
         ]);
     }
 
     public function store()
     {
         $rules = [
-            'code'        => 'required|min_length[2]|max_length[50]|is_unique[promos.code]',
-            'type'        => 'required|in_list[percent,fixed]',
-            'value'       => 'required|numeric|greater_than[0]',
-            'valid_from'  => 'required',
+            'code' => 'required|min_length[2]|max_length[50]|is_unique[promos.code]',
+            'type' => 'required|in_list[percent,fixed]',
+            'value' => 'required|numeric|greater_than[0]',
+            'valid_from' => 'required',
             'valid_until' => 'required',
         ];
 
@@ -58,12 +61,12 @@ class Promo extends BaseController
         }
 
         $this->db->table('promos')->insert([
-            'code'        => strtoupper($this->request->getPost('code')),
-            'type'        => $this->request->getPost('type'),
-            'value'       => $this->request->getPost('value'),
-            'valid_from'  => $this->request->getPost('valid_from'),
+            'code' => strtoupper($this->request->getPost('code')),
+            'type' => $this->request->getPost('type'),
+            'value' => $this->request->getPost('value'),
+            'valid_from' => $this->request->getPost('valid_from'),
             'valid_until' => $this->request->getPost('valid_until'),
-            'status'      => $this->request->getPost('status') ?? 'active',
+            'status' => $this->request->getPost('status') ?? 'active',
         ]);
 
         return redirect()->to(base_url('admin/promo'))
@@ -79,10 +82,10 @@ class Promo extends BaseController
         }
 
         return view('admin/promo/form', [
-            'title'      => 'Edit Promo',
+            'title' => 'Edit Promo',
             'formAction' => base_url('admin/promo/update/' . $id),
-            'promo'      => $promo,
-            'errors'     => [],
+            'promo' => $promo,
+            'errors' => [],
         ]);
     }
 
@@ -94,10 +97,10 @@ class Promo extends BaseController
         }
 
         $rules = [
-            'code'        => "required|min_length[2]|max_length[50]|is_unique[promos.code,id,{$id}]",
-            'type'        => 'required|in_list[percent,fixed]',
-            'value'       => 'required|numeric|greater_than[0]',
-            'valid_from'  => 'required',
+            'code' => "required|min_length[2]|max_length[50]|is_unique[promos.code,id,{$id}]",
+            'type' => 'required|in_list[percent,fixed]',
+            'value' => 'required|numeric|greater_than[0]',
+            'valid_from' => 'required',
             'valid_until' => 'required',
         ];
 
@@ -107,12 +110,12 @@ class Promo extends BaseController
         }
 
         $this->db->table('promos')->where('id', $id)->update([
-            'code'        => strtoupper($this->request->getPost('code')),
-            'type'        => $this->request->getPost('type'),
-            'value'       => $this->request->getPost('value'),
-            'valid_from'  => $this->request->getPost('valid_from'),
+            'code' => strtoupper($this->request->getPost('code')),
+            'type' => $this->request->getPost('type'),
+            'value' => $this->request->getPost('value'),
+            'valid_from' => $this->request->getPost('valid_from'),
             'valid_until' => $this->request->getPost('valid_until'),
-            'status'      => $this->request->getPost('status'),
+            'status' => $this->request->getPost('status'),
         ]);
 
         return redirect()->to(base_url('admin/promo'))
@@ -143,7 +146,17 @@ class Promo extends BaseController
             return redirect()->to(base_url('admin/promo'))->with('error', 'Promo tidak ditemukan.');
         }
 
-        $this->db->table('promos')->where('id', $id)->delete();
+        if ($this->promoModel->isUsed($id, $promo['code'])) {
+            return redirect()->to(base_url('admin/promo'))
+                ->with('error', 'Promo tidak bisa dihapus karena sudah digunakan pada transaksi. Silakan nonaktifkan promo saja.');
+        }
+
+        try {
+            $this->db->table('promos')->where('id', $id)->delete();
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('admin/promo'))
+                ->with('error', 'Promo tidak bisa dihapus karena masih terhubung dengan data lain.');
+        }
 
         return redirect()->to(base_url('admin/promo'))
             ->with('success', 'Promo "' . $promo['code'] . '" berhasil dihapus.');

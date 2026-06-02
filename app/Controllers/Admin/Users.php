@@ -17,7 +17,7 @@ class Users extends BaseController
 
     public function index()
     {
-        $search     = $this->request->getGet('search');
+        $search = $this->request->getGet('search');
         $filterRole = $this->request->getGet('role');
 
         $builder = $this->userModel->db->table('users');
@@ -39,9 +39,9 @@ class Users extends BaseController
         }
 
         $data = [
-            'title'      => 'Kelola User',
-            'users'      => $builder->get()->getResultArray(),
-            'search'     => $search,
+            'title' => 'Kelola User',
+            'users' => $builder->get()->getResultArray(),
+            'search' => $search,
             'filterRole' => $filterRole,
         ];
 
@@ -51,10 +51,10 @@ class Users extends BaseController
     public function create()
     {
         $data = [
-            'title'      => 'Tambah User',
+            'title' => 'Tambah User',
             'formAction' => base_url('admin/users/store'),
-            'errors'     => [],
-            'user'       => null,
+            'errors' => [],
+            'user' => null,
         ];
 
         return view('admin/users/form', $data);
@@ -63,23 +63,23 @@ class Users extends BaseController
     public function store()
     {
         $rules = [
-            'name'            => 'required|min_length[2]|max_length[100]',
-            'username'        => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
-            'role'            => 'required|in_list[kasir,waiter,dapur]',
-            'password'        => 'required|min_length[6]',
-            'password_confirm'=> 'required|matches[password]',
+            'name' => 'required|min_length[2]|max_length[100]',
+            'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
+            'role' => 'required|in_list[kasir,waiter,dapur]',
+            'password' => 'required|min_length[6]',
+            'password_confirm' => 'required|matches[password]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->userModel->insert([
-            'name'          => $this->request->getPost('name'),
-            'username'      => $this->request->getPost('username'),
-            'role'          => $this->request->getPost('role'),
-            'shift'         => $this->request->getPost('shift'),
+            'name' => $this->request->getPost('name'),
+            'username' => $this->request->getPost('username'),
+            'role' => $this->request->getPost('role'),
+            'shift' => $this->request->getPost('shift'),
             'status' => $this->request->getPost('status') ?? 'aktif',
             'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
         ]);
@@ -91,19 +91,19 @@ class Users extends BaseController
     public function edit($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa mengubah user dengan role ini.');
         }
 
         $data = [
-            'title'      => 'Edit User',
+            'title' => 'Edit User',
             'formAction' => base_url('admin/users/update/' . $id),
-            'errors'     => [],
-            'user'       => $user,
+            'errors' => [],
+            'user' => $user,
         ];
 
         return view('admin/users/form', $data);
@@ -112,31 +112,31 @@ class Users extends BaseController
     public function update($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa mengubah user dengan role ini.');
         }
 
         $rules = [
-            'name'     => 'required|min_length[2]|max_length[100]',
+            'name' => 'required|min_length[2]|max_length[100]',
             'username' => "required|min_length[3]|max_length[50]|is_unique[users.username,id,{$id}]",
-            'role'     => 'required|in_list[kasir,waiter,dapur]',
+            'role' => 'required|in_list[kasir,waiter,dapur]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->userModel->update($id, [
-            'name'     => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'username' => $this->request->getPost('username'),
-            'role'     => $this->request->getPost('role'),
-            'shift'    => $this->request->getPost('shift'),
-            'status'   => $this->request->getPost('status'),
+            'role' => $this->request->getPost('role'),
+            'shift' => $this->request->getPost('shift'),
+            'status' => $this->request->getPost('status'),
         ]);
 
         return redirect()->to(base_url('admin/users'))
@@ -146,11 +146,11 @@ class Users extends BaseController
     public function resetPassword($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa mereset password user dengan role ini.');
         }
 
@@ -166,7 +166,7 @@ class Users extends BaseController
     public function delete($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
         }
 
@@ -175,33 +175,43 @@ class Users extends BaseController
                 ->with('error', 'Anda tidak bisa menghapus akun sendiri.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa menghapus user dengan role ini.');
         }
 
-        $this->userModel->delete($id);
+        if ($this->userModel->isUsed($id)) {
+            return redirect()->to(base_url('admin/users'))
+                ->with('error', 'User tidak bisa dihapus karena sudah memiliki riwayat pesanan/transaksi. Silakan nonaktifkan user saja.');
+        }
+
+        try {
+            $this->userModel->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('admin/users'))
+                ->with('error', 'User tidak bisa dihapus karena masih terhubung dengan data lain.');
+        }
 
         return redirect()->to(base_url('admin/users'))
             ->with('success', 'User berhasil dihapus.');
     }
 
     public function toggle($id)
-{
-    $user = $this->userModel->find($id);
-    if (!$user) {
-        return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
+    {
+        $user = $this->userModel->find($id);
+        if (!$user) {
+            return redirect()->to(base_url('admin/users'))->with('error', 'User tidak ditemukan.');
+        }
+
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
+            return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa mengubah status user dengan role ini.');
+        }
+
+        $newStatus = $user['status'] == 'aktif' ? 'nonaktif' : 'aktif';
+        $this->userModel->update($id, ['status' => $newStatus]);
+
+        $label = $newStatus == 'aktif' ? 'diaktifkan' : 'dinonaktifkan';
+        return redirect()->to(base_url('admin/users'))
+            ->with('success', 'User "' . $user['username'] . '" berhasil ' . $label . '.');
     }
-
-    if (! in_array($user['role'], $this->allowedRoles, true)) {
-        return redirect()->to(base_url('admin/users'))->with('error', 'Anda tidak bisa mengubah status user dengan role ini.');
-    }
-
-    $newStatus = $user['status'] == 'aktif' ? 'nonaktif' : 'aktif';
-    $this->userModel->update($id, ['status' => $newStatus]);
-
-    $label = $newStatus == 'aktif' ? 'diaktifkan' : 'dinonaktifkan';
-    return redirect()->to(base_url('admin/users'))
-        ->with('success', 'User "' . $user['username'] . '" berhasil ' . $label . '.');
-}
 
 }

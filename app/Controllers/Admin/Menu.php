@@ -13,13 +13,13 @@ class Menu extends BaseController
 
     public function __construct()
     {
-        $this->menuModel     = new MenuModel();
+        $this->menuModel = new MenuModel();
         $this->kategoriModel = new KategoriModel();
     }
 
     public function index()
     {
-        $search         = $this->request->getGet('search');
+        $search = $this->request->getGet('search');
         $filterKategori = $this->request->getGet('category_id');
 
         $builder = $this->menuModel->getMenuWithKategori();
@@ -32,10 +32,10 @@ class Menu extends BaseController
         }
 
         $data = [
-            'title'          => 'Manajemen Menu',
-            'menus'          => $builder->get()->getResultArray(),
-            'kategoris'      => $this->kategoriModel->findAll(),
-            'search'         => $search,
+            'title' => 'Manajemen Menu',
+            'menus' => $builder->get()->getResultArray(),
+            'kategoris' => $this->kategoriModel->findAll(),
+            'search' => $search,
             'filterKategori' => $filterKategori,
         ];
 
@@ -45,11 +45,11 @@ class Menu extends BaseController
     public function create()
     {
         $data = [
-            'title'      => 'Tambah Menu',
-            'kategoris'  => $this->kategoriModel->findAll(),
+            'title' => 'Tambah Menu',
+            'kategoris' => $this->kategoriModel->findAll(),
             'formAction' => base_url('admin/menu/store'),
-            'errors'     => [],
-            'menu'       => [],
+            'errors' => [],
+            'menu' => [],
         ];
 
         return view('admin/menu/form', $data);
@@ -58,23 +58,23 @@ class Menu extends BaseController
     public function store()
     {
         $rules = [
-            'name'        => 'required|min_length[2]|max_length[100]',
+            'name' => 'required|min_length[2]|max_length[100]',
             'category_id' => 'required',
-            'price'       => 'required|numeric|greater_than_equal_to[0]',
+            'price' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->menuModel->insert([
-            'name'        => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'category_id' => $this->request->getPost('category_id'),
-            'price'       => $this->request->getPost('price'),
-            'hpp'         => $this->request->getPost('hpp') ?? 0,
+            'price' => $this->request->getPost('price'),
+            'hpp' => $this->request->getPost('hpp') ?? 0,
             'description' => $this->request->getPost('description'),
-            'status'      => $this->request->getPost('status') ?? 'available',
+            'status' => $this->request->getPost('status') ?? 'available',
         ]);
 
         return redirect()->to(base_url('admin/menu'))
@@ -84,16 +84,16 @@ class Menu extends BaseController
     public function edit($id)
     {
         $menu = $this->menuModel->find($id);
-        if (! $menu) {
+        if (!$menu) {
             return redirect()->to(base_url('admin/menu'))->with('error', 'Menu tidak ditemukan.');
         }
 
         $data = [
-            'title'      => 'Edit Menu',
-            'kategoris'  => $this->kategoriModel->findAll(),
+            'title' => 'Edit Menu',
+            'kategoris' => $this->kategoriModel->findAll(),
             'formAction' => base_url('admin/menu/update/' . $id),
-            'errors'     => [],
-            'menu'       => $menu,
+            'errors' => [],
+            'menu' => $menu,
         ];
 
         return view('admin/menu/form', $data);
@@ -102,28 +102,28 @@ class Menu extends BaseController
     public function update($id)
     {
         $menu = $this->menuModel->find($id);
-        if (! $menu) {
+        if (!$menu) {
             return redirect()->to(base_url('admin/menu'))->with('error', 'Menu tidak ditemukan.');
         }
 
         $rules = [
-            'name'        => 'required|min_length[2]|max_length[100]',
+            'name' => 'required|min_length[2]|max_length[100]',
             'category_id' => 'required',
-            'price'       => 'required|numeric|greater_than_equal_to[0]',
+            'price' => 'required|numeric|greater_than_equal_to[0]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->menuModel->update($id, [
-            'name'        => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'category_id' => $this->request->getPost('category_id'),
-            'price'       => $this->request->getPost('price'),
-            'hpp'         => $this->request->getPost('hpp') ?? 0,
+            'price' => $this->request->getPost('price'),
+            'hpp' => $this->request->getPost('hpp') ?? 0,
             'description' => $this->request->getPost('description'),
-            'status'      => $this->request->getPost('status'),
+            'status' => $this->request->getPost('status'),
         ]);
 
         return redirect()->to(base_url('admin/menu'))
@@ -133,11 +133,21 @@ class Menu extends BaseController
     public function delete($id)
     {
         $menu = $this->menuModel->find($id);
-        if (! $menu) {
+        if (!$menu) {
             return redirect()->to(base_url('admin/menu'))->with('error', 'Menu tidak ditemukan.');
         }
 
-        $this->menuModel->delete($id);
+        if ($this->menuModel->isUsed($id)) {
+            return redirect()->to(base_url('admin/menu'))
+                ->with('error', 'Menu tidak bisa dihapus karena sudah digunakan pada resep atau transaksi. Jika menu tidak dijual lagi, ubah status menjadi unavailable/nonaktif.');
+        }
+
+        try {
+            $this->menuModel->delete($id);
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('admin/menu'))
+                ->with('error', 'Data tidak bisa dihapus karena masih terhubung dengan data lain.');
+        }
 
         return redirect()->to(base_url('admin/menu'))
             ->with('success', 'Menu berhasil dihapus.');
