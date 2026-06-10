@@ -18,29 +18,33 @@ class Menu extends BaseController
     }
 
     public function index()
-    {
-        $search = $this->request->getGet('search');
-        $filterKategori = $this->request->getGet('category_id');
+{
+    $search         = $this->request->getGet('search');
+    $filterKategori = $this->request->getGet('category_id');
+    $filterStatus   = $this->request->getGet('status') ?? 'available'; // ← BARU
 
-        $builder = $this->menuModel->getMenuWithKategori();
+    $builder = $this->menuModel->getMenuWithKategori();
 
-        if ($search) {
-            $builder->like('m.name', $search);
-        }
-        if ($filterKategori) {
-            $builder->where('m.category_id', $filterKategori);
-        }
-
-        $data = [
-            'title' => 'Manajemen Menu',
-            'menus' => $builder->get()->getResultArray(),
-            'kategoris' => $this->kategoriModel->findAll(),
-            'search' => $search,
-            'filterKategori' => $filterKategori,
-        ];
-
-        return view('admin/menu/index', $data);
+    if ($search) {
+        $builder->like('m.name', $search);
     }
+    if ($filterKategori) {
+        $builder->where('m.category_id', $filterKategori);
+    }
+
+    $builder->where('m.status', $filterStatus); // ← BARU
+
+    $data = [
+        'title'          => 'Manajemen Menu',
+        'menus'          => $builder->get()->getResultArray(),
+        'kategoris'      => $this->kategoriModel->findAll(),
+        'search'         => $search,
+        'filterKategori' => $filterKategori,
+        'filterStatus'   => $filterStatus, // ← BARU
+    ];
+
+    return view('admin/menu/index', $data);
+}
 
     public function create()
     {

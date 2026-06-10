@@ -48,8 +48,8 @@
                 <div class="col-md-4">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
-                        <option value="available"   <?= old('status', $menu['status'] ?? 'available') == 'available'   ? 'selected' : '' ?>>Tersedia</option>
-                        <option value="unavailable" <?= old('status', $menu['status'] ?? '') == 'unavailable' ? 'selected' : '' ?>>Habis</option>
+                        <option value="available"   <?= old('status', $menu['status'] ?? 'available') == 'available'   ? 'selected' : '' ?>>Aktif</option>
+                        <option value="unavailable" <?= old('status', $menu['status'] ?? '') == 'unavailable' ? 'selected' : '' ?>>Non-Aktif</option>
                     </select>
                 </div>
 
