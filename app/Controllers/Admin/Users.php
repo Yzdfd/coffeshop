@@ -19,9 +19,11 @@ class Users extends BaseController
     {
         $search = $this->request->getGet('search');
         $filterRole = $this->request->getGet('role');
+        $filterStatus = $this->request->getGet('status') ?? 'aktif'; // ← BARU
 
         $builder = $this->userModel->db->table('users');
         $builder->select('id, name, username, role, shift, status, created_at');
+        
 
         // ROLE ADMIN: hanya boleh CRUD kasir/waiter/dapur
         $builder->whereIn('role', $this->allowedRoles);
@@ -37,12 +39,13 @@ class Users extends BaseController
                 $builder->where('role', $filterRole);
             }
         }
-
+        $builder->where('status', $filterStatus); // ← BARU
         $data = [
             'title' => 'Kelola User',
             'users' => $builder->get()->getResultArray(),
             'search' => $search,
             'filterRole' => $filterRole,
+            'filterStatus' => $filterStatus, 
         ];
 
         return view('admin/users/index', $data);
