@@ -23,16 +23,16 @@ class Users extends BaseController
                 'label' => 'Owner',
                 'items' => [
                     [
-                        'url'    => base_url('owner'),
+                        'url' => base_url('owner'),
                         'active' => strpos(current_url(), 'owner') !== false && strpos(current_url(), 'owner/users') === false && strpos(current_url(), 'owner/stok-alert') === false,
-                        'icon'   => 'bi bi-bar-chart-line',
-                        'text'   => 'Dashboard',
+                        'icon' => 'bi bi-bar-chart-line',
+                        'text' => 'Dashboard',
                     ],
                     [
-                        'url'    => base_url('owner/stok-alert'),
+                        'url' => base_url('owner/stok-alert'),
                         'active' => strpos(current_url(), 'owner/stok-alert') !== false,
-                        'icon'   => 'bi bi-exclamation-triangle',
-                        'text'   => 'Alert Stok',
+                        'icon' => 'bi bi-exclamation-triangle',
+                        'text' => 'Alert Stok',
                     ],
                 ],
             ],
@@ -40,10 +40,10 @@ class Users extends BaseController
                 'label' => 'Manajemen',
                 'items' => [
                     [
-                        'url'    => base_url('owner/users'),
+                        'url' => base_url('owner/users'),
                         'active' => strpos(current_url(), 'owner/users') !== false,
-                        'icon'   => 'bi bi-people',
-                        'text'   => 'Kelola User',
+                        'icon' => 'bi bi-people',
+                        'text' => 'Kelola User',
                     ],
                 ],
             ],
@@ -51,11 +51,11 @@ class Users extends BaseController
                 'label' => 'Akun',
                 'items' => [
                     [
-                        'url'    => base_url('logout'),
+                        'url' => base_url('logout'),
                         'active' => false,
-                        'icon'   => 'bi bi-box-arrow-left',
-                        'text'   => 'Logout',
-                        'class'  => 'nav-logout',
+                        'icon' => 'bi bi-box-arrow-left',
+                        'text' => 'Logout',
+                        'class' => 'nav-logout',
                     ],
                 ],
             ],
@@ -64,7 +64,7 @@ class Users extends BaseController
 
     public function index()
     {
-        $search     = $this->request->getGet('search');
+        $search = $this->request->getGet('search');
         $filterRole = $this->request->getGet('role');
 
         $builder = $this->userModel->db->table('users')
@@ -84,49 +84,49 @@ class Users extends BaseController
         $users = $builder->orderBy('created_at', 'DESC')->get()->getResultArray();
 
         return view('owner/users/index', [
-            'title'          => 'Kelola User',
-            'sidebarTitle'   => 'Owner',
-            'sidebarSections'=> $this->sidebarSections(),
-            'users'          => $users,
-            'search'         => $search,
-            'filterRole'     => $filterRole,
+            'title' => 'Kelola User',
+            'sidebarTitle' => 'Owner',
+            'sidebarSections' => $this->sidebarSections(),
+            'users' => $users,
+            'search' => $search,
+            'filterRole' => $filterRole,
         ]);
     }
 
     public function create()
     {
         return view('owner/users/form', [
-            'title'           => 'Tambah User',
-            'sidebarTitle'    => 'Owner',
+            'title' => 'Tambah User',
+            'sidebarTitle' => 'Owner',
             'sidebarSections' => $this->sidebarSections(),
-            'formAction'      => base_url('owner/users/store'),
-            'errors'          => [],
-            'user'            => null,
-            'roles'           => $this->allowedRoles,
+            'formAction' => base_url('owner/users/store'),
+            'errors' => [],
+            'user' => null,
+            'roles' => $this->allowedRoles,
         ]);
     }
 
     public function store()
     {
         $rules = [
-            'name'             => 'required|min_length[2]|max_length[100]',
-            'username'         => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
-            'role'             => 'required|in_list[admin,waiter,kasir,dapur,owner]',
-            'password'         => 'required|min_length[6]',
+            'name' => 'required|min_length[2]|max_length[100]',
+            'username' => 'required|min_length[3]|max_length[50]|is_unique[users.username]',
+            'role' => 'required|in_list[admin,waiter,kasir,dapur,owner]',
+            'password' => 'required|min_length[6]',
             'password_confirm' => 'required|matches[password]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()
                 ->with('errors', $this->validator->getErrors());
         }
 
         $this->userModel->insert([
-            'name'          => $this->request->getPost('name'),
-            'username'      => $this->request->getPost('username'),
-            'role'          => $this->request->getPost('role'),
-            'shift'         => $this->request->getPost('shift'),
-            'status'        => $this->request->getPost('status') ?? 'aktif',
+            'name' => $this->request->getPost('name'),
+            'username' => $this->request->getPost('username'),
+            'role' => $this->request->getPost('role'),
+            'shift' => $this->request->getPost('shift'),
+            'status' => $this->request->getPost('status') ?? 'aktif',
             'password_hash' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
         ]);
 
@@ -137,47 +137,47 @@ class Users extends BaseController
     public function edit($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('owner/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('owner/users'))->with('error', 'Role user tidak valid.');
         }
 
         return view('owner/users/form', [
-            'title'           => 'Edit User',
-            'sidebarTitle'    => 'Owner',
+            'title' => 'Edit User',
+            'sidebarTitle' => 'Owner',
             'sidebarSections' => $this->sidebarSections(),
-            'formAction'      => base_url('owner/users/update/' . $id),
-            'errors'          => [],
-            'user'            => $user,
-            'roles'           => $this->allowedRoles,
+            'formAction' => base_url('owner/users/update/' . $id),
+            'errors' => [],
+            'user' => $user,
+            'roles' => $this->allowedRoles,
         ]);
     }
 
     public function update($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('owner/users'))->with('error', 'User tidak ditemukan.');
         }
 
         $rules = [
-            'name'     => 'required|min_length[2]|max_length[100]',
+            'name' => 'required|min_length[2]|max_length[100]',
             'username' => "required|min_length[3]|max_length[50]|is_unique[users.username,id,{$id}]",
-            'role'     => 'required|in_list[admin,waiter,kasir,dapur,owner]',
+            'role' => 'required|in_list[admin,waiter,kasir,dapur,owner]',
         ];
 
-        if (! $this->validate($rules)) {
+        if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
 
         $this->userModel->update($id, [
-            'name'   => $this->request->getPost('name'),
+            'name' => $this->request->getPost('name'),
             'username' => $this->request->getPost('username'),
-            'role'   => $this->request->getPost('role'),
-            'shift'  => $this->request->getPost('shift'),
+            'role' => $this->request->getPost('role'),
+            'shift' => $this->request->getPost('shift'),
             'status' => $this->request->getPost('status'),
         ]);
 
@@ -188,7 +188,7 @@ class Users extends BaseController
     public function resetPassword($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('owner/users'))->with('error', 'User tidak ditemukan.');
         }
 
@@ -209,12 +209,22 @@ class Users extends BaseController
         }
 
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('owner/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! $this->userModel->delete($id)) {
-            return redirect()->to(base_url('owner/users'))->with('error', 'Gagal menghapus user.');
+        if ($this->userModel->isUsed($id)) {
+            return redirect()->to(base_url('owner/users'))
+                ->with('error', 'User tidak bisa dihapus karena sudah memiliki riwayat pesanan/transaksi. Silakan nonaktifkan user saja.');
+        }
+
+        try {
+            if (!$this->userModel->delete($id)) {
+                return redirect()->to(base_url('owner/users'))->with('error', 'Gagal menghapus user.');
+            }
+        } catch (\Throwable $e) {
+            return redirect()->to(base_url('owner/users'))
+                ->with('error', 'User tidak bisa dihapus karena masih terhubung dengan data lain.');
         }
 
         return redirect()->to(base_url('owner/users'))->with('success', 'User berhasil dihapus.');
@@ -223,11 +233,11 @@ class Users extends BaseController
     public function toggle($id)
     {
         $user = $this->userModel->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to(base_url('owner/users'))->with('error', 'User tidak ditemukan.');
         }
 
-        if (! in_array($user['role'], $this->allowedRoles, true)) {
+        if (!in_array($user['role'], $this->allowedRoles, true)) {
             return redirect()->to(base_url('owner/users'))->with('error', 'Role user tidak valid.');
         }
 

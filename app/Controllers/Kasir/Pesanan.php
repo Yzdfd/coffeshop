@@ -218,4 +218,17 @@ class Pesanan extends BaseController
         return redirect()->to(base_url('kasir/pesanan'))
             ->with('success', 'Pesanan #' . $id . ' berhasil dibatalkan.');
     }
+
+   public function menus()
+{
+    $katId = $this->request->getGet('kategori');
+    $builder = $this->db->table('menus m')
+        ->select('m.*, c.name as nama_kategori')
+        ->join('categories c', 'c.id = m.category_id', 'left')
+        ->where('m.status', 'available');
+    if ($katId) {
+        $builder->where('m.category_id', $katId);
+    }
+    return $this->response->setJSON($builder->get()->getResultArray());
+}
 }

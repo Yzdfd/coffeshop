@@ -7,19 +7,19 @@
             <div class="card-body py-2">
                 <div class="d-flex gap-2 flex-wrap align-items-center">
                     <span class="text-muted small me-1">Kategori:</span>
-                    <a href="<?= base_url('kasir/pesanan/buat') ?>"
-                        class="btn btn-sm <?= !$filterKategori ? 'btn-success' : 'btn-outline-secondary' ?>">Semua</a>
-                    <?php foreach ($kategoris as $k): ?>
-                    <a href="<?= base_url('kasir/pesanan/buat?kategori=' . $k['id']) ?>"
-                        class="btn btn-sm <?= $filterKategori == $k['id'] ? 'btn-success' : 'btn-outline-secondary' ?>">
-                        <?= esc($k['name']) ?>
-                    </a>
-                    <?php endforeach; ?>
+                    <button onclick="filterKategori(0)" id="cat-0"
+                     class="btn btn-sm btn-success">Semua</button>
+                        <?php foreach ($kategoris as $k): ?>
+                    <button onclick="filterKategori(<?= $k['id'] ?>)" id="cat-<?= $k['id'] ?>"
+                            class="btn btn-sm btn-outline-secondary">
+                            <?= esc($k['name']) ?>
+                        </button>
+                        <?php endforeach; ?>
                 </div>
             </div>
         </div>
 
-        <div class="row g-3">
+        <div class="row g-3" id="menuGrid">
             <?php if (empty($menus)): ?>
             <div class="col-12">
                 <div class="alert alert-info">Tidak ada menu tersedia.</div>
@@ -129,6 +129,47 @@
 const allMenus = <?= json_encode($menus, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 let recommendationRules = [];
 let orderItems = [];
+let aktivKategori = 0;
+
+function filterKategori(katId) {
+    aktivKategori = katId;
+    document.querySelectorAll('[id^="cat-"]').forEach(btn => {
+        btn.className = 'btn btn-sm btn-outline-secondary';
+    });
+    document.getElementById('cat-' + katId).className = 'btn btn-sm btn-success';
+
+    fetch('<?= base_url('kasir/pesanan/menus') ?>?kategori=' + katId)
+        .then(r => r.json())
+        .then(menus => renderMenus(menus));
+}
+
+function renderMenus(menus) {
+    const container = document.getElementById('menuGrid');
+    if (menus.length === 0) {
+        container.innerHTML = '<div class="col-12"><div class="alert alert-info">Tidak ada menu tersedia.</div></div>';
+        return;
+    }
+    let html = '';
+    menus.forEach(m => {
+        const unavail = m.status != 'available';
+        html += `<div class="col-sm-6 col-md-4">
+            <div class="card border-0 shadow-sm menu-card h-100 ${unavail ? 'unavailable' : ''}"
+                 ${!unavail ? `onclick="tambahItem(${m.id}, '${m.name.replace(/'/g,"\\'")}', ${m.price})"` : ''}>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <h6 class="card-title mb-0 fw-semibold" style="font-size:14px">${m.name}</h6>
+                        ${unavail ? '<span class="badge bg-danger ms-1" style="font-size:10px">Habis</span>' : ''}
+                    </div>
+                    <p class="text-muted mb-1" style="font-size:11px">${m.nama_kategori ?? ''}</p>
+                    <div class="fw-bold text-success">Rp ${Number(m.price).toLocaleString('id-ID')}</div>
+                </div>
+            </div>
+        </div>`;
+
+        
+    });
+    container.innerHTML = html;
+}
 console.log(allMenus);
 console.log(recommendationRules);
 
