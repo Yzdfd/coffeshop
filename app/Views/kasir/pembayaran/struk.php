@@ -50,12 +50,10 @@
                     <span><?= $order['table_id'] ? 'Meja ' . ($order['table_number'] ?? $order['table_id']) : 'Takeaway' ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
-                    <span>Tanggal</span><span><?= (new DateTime($transaksi['paid_at'],
-                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('d/m/Y') ?></span>
+                    <span>Tanggal</span><span><?= date('d/m/Y', strtotime($transaksi['paid_at'])) ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
-                    <span>Waktu</span><span><?= (new DateTime($transaksi['paid_at'],
-                    new DateTimeZone('UTC')))->setTimezone(new DateTimeZone('Asia/Jakarta'))->format('H:i') ?></span>
+                    <span>Waktu</span><span><?= date('H:i', strtotime($transaksi['paid_at'])) ?></span>
                 </div>
                 <div class="d-flex justify-content-between small">
                     <span>Metode</span><span><?= strtoupper($transaksi['payment_method']) ?></span>
