@@ -19,7 +19,24 @@
             <a href="<?= base_url('admin/users/create') ?>" class="btn btn-primary btn-sm">
                 <i class="bi bi-person-plus me-1"></i> Tambah User
             </a>
+            <?php
+    $currentStatus = $filterStatus ?? 'aktif';
+    $toggleStatus  = $currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
+    $toggleLabel   = $currentStatus === 'aktif' ? 'Lihat Nonaktif' : 'Lihat Aktif';
+    $toggleIcon    = $currentStatus === 'aktif' ? 'bi-eye-slash' : 'bi-eye';
+    $toggleClass   = $currentStatus === 'aktif' ? 'btn-outline-danger' : 'btn-outline-success';
+    $badgeClass    = $currentStatus === 'aktif' ? 'bg-success' : 'bg-danger';
+    $badgeLabel    = $currentStatus === 'aktif' ? 'Aktif' : 'Nonaktif';
+    $toggleUrl     = base_url('admin/users') . '?status=' . $toggleStatus
+                     . ($search      ? '&search=' . urlencode($search) : '')
+                     . ($filterRole  ? '&role='   . $filterRole        : '');
+?>
+<span class="badge <?= $badgeClass ?> fs-6 px-3 py-2"><?= $badgeLabel ?></span>
+<a href="<?= $toggleUrl ?>" class="btn <?= $toggleClass ?> btn-sm">
+    <i class="bi <?= $toggleIcon ?> me-1"></i> <?= $toggleLabel ?>
+</a>
             <form method="get" class="d-flex gap-2 flex-wrap">
+                <input type="hidden" name="status" value="<?= esc($currentStatus) ?>">
                 <input type="text" name="search" class="form-control form-control-sm" value="<?= esc($search ?? '') ?>"
                     placeholder="Cari nama / username...">
                 <select name="role" class="form-select form-select-sm" style="width:auto">
