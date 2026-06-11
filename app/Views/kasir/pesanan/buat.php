@@ -1,5 +1,142 @@
 <?= $this->include('kasir/layouts/header') ?>
 
+<?php
+/**
+ * ── KATEGORI STYLE MAP ──────────────────────────────────────────────
+ * Icon & warna per kategori. Kunci = nama kategori (lowercase, trim).
+ * Fallback ke 'default' jika nama tidak cocok.
+ *
+ * Cara kerja: icon & warna disimpan di sini (PHP), bukan di DB.
+ * Admin bisa "pilih icon" lewat form kategori — nilainya disimpan
+ * di kolom description dengan prefix [icon:X] [color:Y], lalu
+ * di-parse di bawah. Jika tidak ada prefix, pakai keyword-matching.
+ */
+$categoryStyles = [
+    // keyword matching (nama mengandung kata ini)
+    'kopi'      => ['icon' => '☕', 'gradient' => 'linear-gradient(135deg,#6f4e37 0%,#c8a97a 100%)', 'badge' => '#6f4e37'],
+    'coffee'    => ['icon' => '☕', 'gradient' => 'linear-gradient(135deg,#6f4e37 0%,#c8a97a 100%)', 'badge' => '#6f4e37'],
+    'teh'       => ['icon' => '🍵', 'gradient' => 'linear-gradient(135deg,#2e7d32 0%,#a5d6a7 100%)', 'badge' => '#2e7d32'],
+    'tea'       => ['icon' => '🍵', 'gradient' => 'linear-gradient(135deg,#2e7d32 0%,#a5d6a7 100%)', 'badge' => '#2e7d32'],
+    'jus'       => ['icon' => '🍹', 'gradient' => 'linear-gradient(135deg,#e65100 0%,#ffcc80 100%)', 'badge' => '#e65100'],
+    'juice'     => ['icon' => '🍹', 'gradient' => 'linear-gradient(135deg,#e65100 0%,#ffcc80 100%)', 'badge' => '#e65100'],
+    'minuman'   => ['icon' => '🥤', 'gradient' => 'linear-gradient(135deg,#1565c0 0%,#90caf9 100%)', 'badge' => '#1565c0'],
+    'drink'     => ['icon' => '🥤', 'gradient' => 'linear-gradient(135deg,#1565c0 0%,#90caf9 100%)', 'badge' => '#1565c0'],
+    'makanan'   => ['icon' => '🍽️', 'gradient' => 'linear-gradient(135deg,#4527a0 0%,#ce93d8 100%)', 'badge' => '#4527a0'],
+    'food'      => ['icon' => '🍽️', 'gradient' => 'linear-gradient(135deg,#4527a0 0%,#ce93d8 100%)', 'badge' => '#4527a0'],
+    'snack'     => ['icon' => '🍟', 'gradient' => 'linear-gradient(135deg,#f57f17 0%,#fff59d 100%)', 'badge' => '#f57f17'],
+    'cemilan'   => ['icon' => '🍟', 'gradient' => 'linear-gradient(135deg,#f57f17 0%,#fff59d 100%)', 'badge' => '#f57f17'],
+    'dessert'   => ['icon' => '🍰', 'gradient' => 'linear-gradient(135deg,#ad1457 0%,#f48fb1 100%)', 'badge' => '#ad1457'],
+    'kue'       => ['icon' => '🍰', 'gradient' => 'linear-gradient(135deg,#ad1457 0%,#f48fb1 100%)', 'badge' => '#ad1457'],
+    'nasi'      => ['icon' => '🍚', 'gradient' => 'linear-gradient(135deg,#795548 0%,#d7ccc8 100%)', 'badge' => '#795548'],
+    'mie'       => ['icon' => '🍜', 'gradient' => 'linear-gradient(135deg,#bf360c 0%,#ffccbc 100%)', 'badge' => '#bf360c'],
+    'bakso'     => ['icon' => '🍲', 'gradient' => 'linear-gradient(135deg,#880e4f 0%,#f8bbd0 100%)', 'badge' => '#880e4f'],
+    'smoothie'  => ['icon' => '🥛', 'gradient' => 'linear-gradient(135deg,#00695c 0%,#b2dfdb 100%)', 'badge' => '#00695c'],
+    'default'   => ['icon' => '🍴', 'gradient' => 'linear-gradient(135deg,#37474f 0%,#b0bec5 100%)', 'badge' => '#37474f'],
+];
+
+/**
+ * Fungsi parse icon dari description field.
+ * Format: [icon:☕] atau [color:#6f4e37] di awal/akhir description.
+ * Admin bisa set ini lewat form tambah/edit kategori.
+ */
+function parseKategoriMeta(string $desc): array {
+    $icon  = null;
+    $color = null;
+    if (preg_match('/\[icon:([^\]]+)\]/', $desc, $m)) $icon  = trim($m[1]);
+    if (preg_match('/\[color:([^\]]+)\]/', $desc, $m)) $color = trim($m[1]);
+    return compact('icon', 'color');
+}
+
+/**
+ * Ambil style untuk satu kategori.
+ * Priority: 1) meta di description, 2) keyword-match, 3) default
+ */
+function getKategoriStyle(string $namaKategori, string $descKategori, array $styleMap): array {
+    $meta = parseKategoriMeta($descKategori);
+
+    // Jika admin set manual via description
+    if ($meta['icon'] || $meta['color']) {
+        $base = $styleMap['default'];
+        if ($meta['icon'])  $base['icon']  = $meta['icon'];
+        if ($meta['color']) {
+            $c = $meta['color'];
+            $base['gradient'] = "linear-gradient(135deg,{$c} 0%,#f5f5f5 100%)";
+            $base['badge'] = $c;
+        }
+        return $base;
+    }
+
+    // Keyword match (nama kategori)
+    $lower = mb_strtolower(trim($namaKategori));
+    foreach ($styleMap as $keyword => $style) {
+        if ($keyword === 'default') continue;
+        if (str_contains($lower, $keyword)) return $style;
+    }
+
+    return $styleMap['default'];
+}
+
+// Pre-build style map untuk semua kategori yang ada
+$katStyleMap = [];
+foreach ($kategoris as $k) {
+    $katStyleMap[$k['id']] = getKategoriStyle(
+        $k['name'],
+        $k['description'] ?? '',
+        $categoryStyles
+    );
+}
+// Untuk menu tanpa kategori
+$katStyleMap[0] = $categoryStyles['default'];
+?>
+
+<style>
+.menu-card {
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.menu-card:hover:not(.unavailable) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .15) !important;
+}
+
+.menu-card.unavailable {
+    cursor: default;
+    opacity: .55;
+    filter: grayscale(0.4);
+}
+
+.menu-card .card-header-cat {
+    height: 6px;
+}
+
+.menu-card .cat-icon {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.stock-badge {
+    font-size: 10px;
+    border-radius: 20px;
+    padding: 2px 7px;
+}
+
+.order-items-scroll {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.order-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+</style>
+
 <div class="row g-4">
     <!-- KIRI: Pilih Menu -->
     <div class="col-lg-8">
@@ -7,14 +144,15 @@
             <div class="card-body py-2">
                 <div class="d-flex gap-2 flex-wrap align-items-center">
                     <span class="text-muted small me-1">Kategori:</span>
-                    <button onclick="filterKategori(0)" id="cat-0"
-                     class="btn btn-sm btn-success">Semua</button>
-                        <?php foreach ($kategoris as $k): ?>
+                    <button onclick="filterKategori(0)" id="cat-0" class="btn btn-sm btn-success">Semua</button>
+                    <?php foreach ($kategoris as $k):
+                            $ks = $katStyleMap[$k['id']];
+                        ?>
                     <button onclick="filterKategori(<?= $k['id'] ?>)" id="cat-<?= $k['id'] ?>"
-                            class="btn btn-sm btn-outline-secondary">
-                            <?= esc($k['name']) ?>
-                        </button>
-                        <?php endforeach; ?>
+                        class="btn btn-sm btn-outline-secondary">
+                        <?= $ks['icon'] ?> <?= esc($k['name']) ?>
+                    </button>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -25,19 +163,51 @@
                 <div class="alert alert-info">Tidak ada menu tersedia.</div>
             </div>
             <?php else: ?>
-            <?php foreach ($menus as $m): ?>
+            <?php foreach ($menus as $m):
+                $katId = $m['category_id'] ?? 0;
+                $ks = $katStyleMap[$katId] ?? $categoryStyles['default'];
+                $stockMenu = $m['stock_menu']; // null = no recipe, int = calculated
+                $isOutOfStock = ($stockMenu !== null && $stockMenu <= 0);
+                $isUnavail = ($m['status'] != 'available') || $isOutOfStock;
+            ?>
             <div class="col-sm-6 col-md-4">
-                <div class="card border-0 shadow-sm menu-card h-100 <?= $m['status'] != 'available' ? 'unavailable' : '' ?>"
-                    <?= $m['status'] == 'available' ? "onclick=\"tambahItem({$m['id']}, '" . addslashes($m['name']) . "', {$m['price']})\"" : '' ?>>
-                    <div class="card-body">
+                <div class="card border-0 shadow-sm menu-card h-100 <?= $isUnavail ? 'unavailable' : '' ?>"
+                    <?= !$isUnavail ? "onclick=\"tambahItem({$m['id']}, '" . addslashes($m['name']) . "', {$m['price']})\"" : '' ?>>
+                    <!-- strip warna kategori di atas card -->
+                    <div class="card-header-cat" style="background:<?= $ks['gradient'] ?>"></div>
+                    <div class="card-body pt-2 pb-2">
                         <div class="d-flex justify-content-between align-items-start mb-1">
-                            <h6 class="card-title mb-0 fw-semibold" style="font-size:14px"><?= esc($m['name']) ?></h6>
-                            <?php if ($m['status'] != 'available'): ?>
-                            <span class="badge bg-danger ms-1" style="font-size:10px">Habis</span>
+                            <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <span class="cat-icon"><?= $ks['icon'] ?></span>
+                                <div>
+                                    <h6 class="card-title mb-0 fw-semibold" style="font-size:13px;line-height:1.2">
+                                        <?= esc($m['name']) ?></h6>
+                                    <?php if ($stockMenu !== null): ?>
+                                    <?php if ($stockMenu <= 0): ?>
+                                    <span class="stock-badge" style="background:#fee2e2;color:#dc2626">Stok habis</span>
+                                    <?php elseif ($stockMenu <= 3): ?>
+                                    <span class="stock-badge" style="background:#fef3c7;color:#d97706">Sisa
+                                        <?= $stockMenu ?> pcs</span>
+                                    <?php else: ?>
+                                    <span class="stock-badge" style="background:#d1fae5;color:#065f46">Stok
+                                        <?= $stockMenu ?></span>
+                                    <?php endif; ?>
+                                    <?php else: ?>
+                                    <span class="stock-badge" style="background:#e0f2fe;color:#0369a1">Tersedia</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php if ($isUnavail): ?>
+                            <span class="badge ms-1"
+                                style="font-size:10px;background:<?= $ks['badge'] ?>;color:#fff">Habis</span>
                             <?php endif; ?>
                         </div>
-                        <p class="text-muted mb-1" style="font-size:11px"><?= esc($m['nama_kategori'] ?? '') ?></p>
-                        <div class="fw-bold text-success">Rp <?= number_format($m['price'], 0, ',', '.') ?></div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <span class="fw-bold text-success" style="font-size:13px">Rp
+                                <?= number_format($m['price'], 0, ',', '.') ?></span>
+                            <span class="badge"
+                                style="font-size:9px;background:<?= $ks['badge'] ?>22;color:<?= $ks['badge'] ?>;border:1px solid <?= $ks['badge'] ?>44"><?= esc($m['nama_kategori'] ?? '') ?></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -68,14 +238,11 @@
                         </div>
                     </div>
 
-
-                    <!-- Nomor Meja (Dine In) -->
                     <div id="boxMeja">
                         <input type="text" class="form-control form-control-sm" id="pilihMeja"
                             placeholder="Contoh: Meja 1, Meja 2...">
                     </div>
 
-                    <!-- Nama / No. HP (Takeaway) -->
                     <div id="boxTakeaway" style="display:none">
                         <input type="text" class="form-control form-control-sm" id="catatanOrder"
                             placeholder="Nama pelanggan / No. HP...">
@@ -90,15 +257,10 @@
                 <div class="mt-3">
                     <div class="border rounded-3 p-3 bg-light-subtle">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="fw-semibold">
-                                Rekomendasi Menu
-                            </span>
+                            <span class="fw-semibold">Rekomendasi Menu</span>
                         </div>
-
                         <div id="recommendationBox">
-                            <small class="text-muted">
-                                Pilih menu terlebih dahulu
-                            </small>
+                            <small class="text-muted">Pilih menu terlebih dahulu</small>
                         </div>
                     </div>
                 </div>
@@ -127,9 +289,56 @@
 
 <script>
 const allMenus = <?= json_encode($menus, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+
+// Category styles dari PHP — dipakai renderMenus JS
+const katStyles = <?= json_encode($katStyleMap, JSON_UNESCAPED_UNICODE) ?>;
+
 let recommendationRules = [];
 let orderItems = [];
 let aktivKategori = 0;
+
+// ── Render menu card (dipakai saat filter via AJAX) ────────────
+function renderMenuCard(m) {
+    const ks = katStyles[m.category_id] || katStyles[0];
+    const stockMenu = m.stock_menu; // null or int
+    const isOutOfStock = (stockMenu !== null && parseInt(stockMenu) <= 0);
+    const unavail = m.status != 'available' || isOutOfStock;
+
+    let stockHtml = '';
+    if (stockMenu === null || stockMenu === undefined) {
+        stockHtml = `<span class="stock-badge" style="background:#e0f2fe;color:#0369a1">Tersedia</span>`;
+    } else if (parseInt(stockMenu) <= 0) {
+        stockHtml = `<span class="stock-badge" style="background:#fee2e2;color:#dc2626">Stok habis</span>`;
+    } else if (parseInt(stockMenu) <= 3) {
+        stockHtml = `<span class="stock-badge" style="background:#fef3c7;color:#d97706">Sisa ${stockMenu} pcs</span>`;
+    } else {
+        stockHtml = `<span class="stock-badge" style="background:#d1fae5;color:#065f46">Stok ${stockMenu}</span>`;
+    }
+
+    const nama = m.name.replace(/'/g, "\\'");
+    return `<div class="col-sm-6 col-md-4">
+        <div class="card border-0 shadow-sm menu-card h-100 ${unavail ? 'unavailable' : ''}"
+             ${!unavail ? `onclick="tambahItem(${m.id}, '${nama}', ${m.price})"` : ''}>
+            <div class="card-header-cat" style="background:${ks.gradient}"></div>
+            <div class="card-body pt-2 pb-2">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div class="d-flex align-items-center gap-2 flex-grow-1">
+                        <span class="cat-icon">${ks.icon}</span>
+                        <div>
+                            <h6 class="card-title mb-0 fw-semibold" style="font-size:13px;line-height:1.2">${m.name}</h6>
+                            ${stockHtml}
+                        </div>
+                    </div>
+                    ${unavail ? `<span class="badge ms-1" style="font-size:10px;background:${ks.badge};color:#fff">Habis</span>` : ''}
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="fw-bold text-success" style="font-size:13px">Rp ${Number(m.price).toLocaleString('id-ID')}</span>
+                    <span class="badge" style="font-size:9px;background:${ks.badge}22;color:${ks.badge};border:1px solid ${ks.badge}44">${m.nama_kategori ?? ''}</span>
+                </div>
+            </div>
+        </div>
+    </div>`;
+}
 
 function filterKategori(katId) {
     aktivKategori = katId;
@@ -140,48 +349,24 @@ function filterKategori(katId) {
 
     fetch('<?= base_url('kasir/pesanan/menus') ?>?kategori=' + katId)
         .then(r => r.json())
-        .then(menus => renderMenus(menus));
+        .then(menus => {
+            const container = document.getElementById('menuGrid');
+            if (menus.length === 0) {
+                container.innerHTML =
+                    '<div class="col-12"><div class="alert alert-info">Tidak ada menu tersedia.</div></div>';
+                return;
+            }
+            container.innerHTML = menus.map(renderMenuCard).join('');
+        });
 }
-
-function renderMenus(menus) {
-    const container = document.getElementById('menuGrid');
-    if (menus.length === 0) {
-        container.innerHTML = '<div class="col-12"><div class="alert alert-info">Tidak ada menu tersedia.</div></div>';
-        return;
-    }
-    let html = '';
-    menus.forEach(m => {
-        const unavail = m.status != 'available';
-        html += `<div class="col-sm-6 col-md-4">
-            <div class="card border-0 shadow-sm menu-card h-100 ${unavail ? 'unavailable' : ''}"
-                 ${!unavail ? `onclick="tambahItem(${m.id}, '${m.name.replace(/'/g,"\\'")}', ${m.price})"` : ''}>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-1">
-                        <h6 class="card-title mb-0 fw-semibold" style="font-size:14px">${m.name}</h6>
-                        ${unavail ? '<span class="badge bg-danger ms-1" style="font-size:10px">Habis</span>' : ''}
-                    </div>
-                    <p class="text-muted mb-1" style="font-size:11px">${m.nama_kategori ?? ''}</p>
-                    <div class="fw-bold text-success">Rp ${Number(m.price).toLocaleString('id-ID')}</div>
-                </div>
-            </div>
-        </div>`;
-
-        
-    });
-    container.innerHTML = html;
-}
-console.log(allMenus);
-console.log(recommendationRules);
 
 fetch("/ml/recomendation.json")
     .then(res => res.json())
     .then(data => {
         recommendationRules = data;
-
-        console.log("RULES:", recommendationRules);
     })
     .catch(err => {
-        console.log("ERROR FETCH:", err);
+        console.log("Rekomendasi tidak tersedia:", err);
     });
 
 function tambahItem(id, nama, harga) {
@@ -224,130 +409,62 @@ function setCatatan(id, val) {
 
 function getRecommendations() {
     let recommendations = [];
-
-    // ambil semua nama menu di cart
     const cartNames = orderItems.map(i => i.nama);
-
     recommendationRules.forEach(rule => {
-
-        // cek apakah antecedents cocok
         const match = rule.antecedents.every(a =>
-            cartNames.some(c =>
-                c.trim().toLowerCase() ===
-                a.trim().toLowerCase()
-            )
+            cartNames.some(c => c.trim().toLowerCase() === a.trim().toLowerCase())
         );
-
         if (match) {
-
             rule.consequents.forEach(item => {
-
-                // jangan tampil kalau udah ada di cart
-                if (!cartNames.some(c =>
-                        c.trim().toLowerCase() ===
-                        item.trim().toLowerCase()
-                    )) {
-
+                if (!cartNames.some(c => c.trim().toLowerCase() === item.trim().toLowerCase())) {
                     recommendations.push({
-                        item: item,
+                        item,
                         confidence: rule.confidence
                     });
-
                 }
-
             });
-
         }
-
     });
-
-    // urut confidence tertinggi
-    recommendations.sort((a, b) =>
-        b.confidence - a.confidence
-    );
-
-    // ambil top 3 unik
-    let result = [];
-    let seen = new Set();
-
+    recommendations.sort((a, b) => b.confidence - a.confidence);
+    let result = [],
+        seen = new Set();
     for (let r of recommendations) {
-
         if (!seen.has(r.item)) {
-
             seen.add(r.item);
             result.push(r);
-
         }
-
         if (result.length === 3) break;
     }
-
     renderRecommendations(result);
 }
 
 function renderRecommendations(data) {
     const box = document.getElementById("recommendationBox");
-
     if (data.length === 0) {
-
-        box.innerHTML = `
-            <small class="text-muted">
-                Tidak ada rekomendasi
-            </small>
-        `;
-
+        box.innerHTML = `<small class="text-muted">Tidak ada rekomendasi</small>`;
         return;
     }
-
     let html = `<div class="d-flex flex-wrap gap-2">`;
-
     data.forEach(r => {
-
-        // cari menu asli
-        const menu = allMenus.find(m =>
-            m.name.trim().toLowerCase() === r.item.trim().toLowerCase()
-        );
-
+        const menu = allMenus.find(m => m.name.trim().toLowerCase() === r.item.trim().toLowerCase());
         if (!menu) return;
-
-        html += `
-    <button
-        type="button"
-        class="btn btn-sm btn-warning"
-        onclick="tambahItem(
-            ${menu.id},
-            '${menu.name.replace(/'/g, "\\'")}',
-            ${menu.price}
-        )"
-    >
-        + ${menu.name}
-    </button>
-`;
-
+        html += `<button type="button" class="btn btn-sm btn-warning"
+            onclick="tambahItem(${menu.id},'${menu.name.replace(/'/g,"\\'")}',${menu.price})">
+            + ${menu.name}</button>`;
     });
-
     html += `</div>`;
-
     box.innerHTML = html;
 }
 
 function renderOrder() {
     const container = document.getElementById('orderItems');
     if (orderItems.length === 0) {
-
         container.innerHTML =
             '<p class="text-muted small text-center py-3"><i class="bi bi-cart-x fs-4 d-block mb-1"></i>Belum ada item dipilih</p>';
-
         document.getElementById('subtotalText').textContent = 'Rp 0';
-
         document.getElementById('itemCountText').textContent = '0 item';
-
-        document.getElementById('recommendationBox').innerHTML = `
-        <small class="text-muted">
-            Pilih menu terlebih dahulu
-        </small>
-    `;
-
+        document.getElementById('recommendationBox').innerHTML =
+            `<small class="text-muted">Pilih menu terlebih dahulu</small>`;
         return;
     }
     let html = '',
@@ -368,7 +485,7 @@ function renderOrder() {
             <div class="d-flex align-items-center gap-1 ms-2">
                 <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="kurangiItem(${item.id})">-</button>
                 <span class="fw-bold">${item.qty}</span>
-                <button class="btn btn-sm btn-outline-success px-2 py-0" onclick="tambahItem(${item.id}, '${item.nama.replace(/'/g, "\\'")}', ${item.harga})">+</button>
+                <button class="btn btn-sm btn-outline-success px-2 py-0" onclick="tambahItem(${item.id},'${item.nama.replace(/'/g,"\\'")}',${item.harga})">+</button>
                 <button class="btn btn-sm btn-outline-danger px-2 py-0 ms-1" onclick="hapusItem(${item.id})"><i class="bi bi-x"></i></button>
             </div>
         </div>
@@ -391,9 +508,6 @@ function toggleTipe() {
     const isDineIn = document.getElementById('tipeDineIn').checked;
     document.getElementById('boxMeja').style.display = isDineIn ? 'block' : 'none';
     document.getElementById('boxTakeaway').style.display = isDineIn ? 'none' : 'block';
-    document.getElementById('labelCatatan').textContent = isDineIn ? 'Catatan Order' : 'Nama / Nomor HP Pelanggan';
-    document.getElementById('catatanOrder').placeholder = isDineIn ? 'Contoh: tidak pedas, extra ice...' :
-        'Contoh: Budi / 0812xxxx';
     if (!isDineIn) document.getElementById('pilihMeja').value = '';
 }
 
@@ -402,25 +516,21 @@ function kirimPesanan() {
         alert('Tambahkan menu terlebih dahulu!');
         return;
     }
-
     const isDineIn = document.getElementById('tipeDineIn').checked;
     const meja = document.getElementById('pilihMeja').value;
-
     if (isDineIn && !meja) {
         alert('Isi nomor meja terlebih dahulu!');
         return;
     }
-
     let catatan = document.getElementById('catatanOrder').value;
     if (!isDineIn) {
-        const nama = document.getElementById('catatanOrder').value.trim();
+        const nama = catatan.trim();
         if (!nama) {
             alert('Isi nama / nomor HP pelanggan untuk takeaway!');
             return;
         }
-        catatan = '[Takeaway: ' + nama + '] ' + catatan;
+        catatan = '[Takeaway: ' + nama + '] ';
     }
-
     document.getElementById('inputMeja').value = meja;
     document.getElementById('inputCatatan').value = catatan;
     document.getElementById('inputItems').value = JSON.stringify(orderItems);

@@ -14,6 +14,19 @@ class Kategori extends BaseController
         $this->kategoriModel = new KategoriModel();
     }
 
+    /**
+     * Encode icon & color ke dalam string description.
+     * Format: [icon:☕][color:#6f4e37] deskripsi_asli
+     */
+    private function buildDescription(string $desc, string $icon, string $color): string
+    {
+        $meta = '';
+        if ($icon)  $meta .= "[icon:{$icon}]";
+        if ($color && $color !== '#6c757d') $meta .= "[color:{$color}]";
+        $desc = trim($desc);
+        return $meta ? $meta . ($desc ? " {$desc}" : '') : $desc;
+    }
+
     public function index()
     {
         $data = [
@@ -37,10 +50,14 @@ class Kategori extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
+        $icon  = $this->request->getPost('icon_kategori') ?? '';
+        $color = $this->request->getPost('color_kategori') ?? '';
+        $desc  = $this->request->getPost('description') ?? '';
+
         $this->kategoriModel->insert([
-            'name' => $this->request->getPost('name'),
-            'description' => $this->request->getPost('description'),
-            'sort_order' => $this->request->getPost('sort_order') ?? 0,
+            'name'        => $this->request->getPost('name'),
+            'description' => $this->buildDescription($desc, $icon, $color),
+            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))
@@ -76,10 +93,14 @@ class Kategori extends BaseController
                 ->with('errors', $this->validator->getErrors());
         }
 
+        $icon  = $this->request->getPost('icon_kategori') ?? '';
+        $color = $this->request->getPost('color_kategori') ?? '';
+        $desc  = $this->request->getPost('description') ?? '';
+
         $this->kategoriModel->update($id, [
-            'name' => $this->request->getPost('name'),
-            'description' => $this->request->getPost('description'),
-            'sort_order' => $this->request->getPost('sort_order') ?? 0,
+            'name'        => $this->request->getPost('name'),
+            'description' => $this->buildDescription($desc, $icon, $color),
+            'sort_order'  => $this->request->getPost('sort_order') ?? 0,
         ]);
 
         return redirect()->to(base_url('admin/kategori'))

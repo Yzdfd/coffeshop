@@ -13,6 +13,47 @@ class Pesanan extends BaseController
         $this->db = \Config\Database::connect();
     }
 
+    // ─── HELPER: hitung stock per menu berdasarkan resep ────────
+    private function hitungStockMenu(array $menus): array
+    {
+        // ambil semua resep sekaligus (batch)
+        $menuIds = array_column($menus, 'id');
+        if (empty($menuIds)) return $menus;
+
+        $recipes = $this->db->table('recipes r')
+            ->select('r.menu_id, r.qty_needed, i.stock_qty')
+            ->join('ingredients i', 'i.id = r.ingredient_id', 'left')
+            ->whereIn('r.menu_id', $menuIds)
+            ->get()->getResultArray();
+
+        // group resep by menu_id
+        $recipeByMenu = [];
+        foreach ($recipes as $r) {
+            $recipeByMenu[$r['menu_id']][] = $r;
+        }
+
+        foreach ($menus as &$m) {
+            $id = $m['id'];
+            if (empty($recipeByMenu[$id])) {
+                // tidak ada resep → stock tidak terbatas (null = tidak ada batasan)
+                $m['stock_menu'] = null;
+            } else {
+                // stock menu = minimum dari semua bahan: floor(stock_bahan / qty_needed)
+                $minStock = PHP_INT_MAX;
+                foreach ($recipeByMenu[$id] as $r) {
+                    $qty = (float)$r['qty_needed'];
+                    if ($qty <= 0) continue;
+                    $possible = (int)floor((float)$r['stock_qty'] / $qty);
+                    $minStock = min($minStock, $possible);
+                }
+                $m['stock_menu'] = ($minStock === PHP_INT_MAX) ? null : $minStock;
+            }
+        }
+        unset($m);
+
+        return $menus;
+    }
+
     // ─── DAFTAR PESANAN ──────────────────────────────────────
     public function index()
     {
@@ -44,7 +85,7 @@ class Pesanan extends BaseController
         $filterKategori = $this->request->getGet('kategori');
 
         $menuBuilder = $this->db->table('menus m')
-            ->select('m.*, c.name as nama_kategori')
+            ->select('m.*, c.name as nama_kategori, c.description as kategori_desc')
             ->join('categories c', 'c.id = m.category_id', 'left')
             ->where('m.status', 'available');
 
@@ -52,10 +93,15 @@ class Pesanan extends BaseController
             $menuBuilder->where('m.category_id', $filterKategori);
         }
 
+        $menus = $menuBuilder->get()->getResultArray();
+        $menus = $this->hitungStockMenu($menus);
+
+        $kategoris = $this->db->table('categories')->orderBy('sort_order')->get()->getResultArray();
+
         return view('kasir/pesanan/buat', [
             'title'          => 'Buat Pesanan',
-            'menus'          => $menuBuilder->get()->getResultArray(),
-            'kategoris'      => $this->db->table('categories')->orderBy('sort_order')->get()->getResultArray(),
+            'menus'          => $menus,
+            'kategoris'      => $kategoris,
             'mejas'          => $this->db->table('tables')->orderBy('number')->get()->getResultArray(),
             'filterKategori' => $filterKategori,
         ]);
@@ -66,18 +112,16 @@ class Pesanan extends BaseController
          $nomorMeja = $this->request->getPost('table_id');
          $notes     = $this->request->getPost('notes');
 
-        // Gabungkan nomor meja ke catatan, table_id dikosongkan
         if ($nomorMeja) {
         $notes = '[' . $nomorMeja . '] ' . $notes;
         }
-        $tableId = null; // tidak pakai FK ke tabel tables
+        $tableId = null;
         $items   = json_decode($this->request->getPost('items'), true);
 
         if (empty($items)) {
             return redirect()->back()->with('error', 'Tidak ada item pesanan.');
         }
 
-        // Buat order - langsung status open, siap dibayar
         $this->db->table('orders')->insert([
             'table_id'   => $tableId,
             'waiter_id'  => session('user_id'),
@@ -87,7 +131,6 @@ class Pesanan extends BaseController
         ]);
         $orderId = $this->db->insertID();
 
-        // Insert order items
         foreach ($items as $item) {
             $menu = $this->db->table('menus')->where('id', $item['id'])->get()->getRow();
             if (!$menu) continue;
@@ -102,7 +145,6 @@ class Pesanan extends BaseController
             ]);
         }
 
-        // Update status meja jika ada
         if ($tableId) {
             $this->db->table('tables')->where('id', $tableId)->update([
                 'status'           => 'occupied',
@@ -110,7 +152,6 @@ class Pesanan extends BaseController
             ]);
         }
 
-        // Langsung redirect ke pembayaran
         return redirect()->to(base_url('kasir/pembayaran/' . $orderId))
             ->with('success', 'Pesanan #' . $orderId . ' berhasil dibuat, silakan proses pembayaran.');
     }
@@ -177,14 +218,17 @@ class Pesanan extends BaseController
 
         $filterKategori = $this->request->getGet('kategori');
         $menuBuilder = $this->db->table('menus m')
-            ->select('m.*, c.name as nama_kategori')
+            ->select('m.*, c.name as nama_kategori, c.description as kategori_desc')
             ->join('categories c', 'c.id = m.category_id', 'left')
             ->where('m.status', 'available');
         if ($filterKategori) { $menuBuilder->where('m.category_id', $filterKategori); }
 
+        $menus = $menuBuilder->get()->getResultArray();
+        $menus = $this->hitungStockMenu($menus);
+
         return view('kasir/pesanan/buat', [
             'title'          => 'Tambah Item ke Pesanan #' . $id,
-            'menus'          => $menuBuilder->get()->getResultArray(),
+            'menus'          => $menus,
             'kategoris'      => $this->db->table('categories')->get()->getResultArray(),
             'mejas'          => [],
             'filterKategori' => $filterKategori,
@@ -219,16 +263,18 @@ class Pesanan extends BaseController
             ->with('success', 'Pesanan #' . $id . ' berhasil dibatalkan.');
     }
 
-   public function menus()
-{
-    $katId = $this->request->getGet('kategori');
-    $builder = $this->db->table('menus m')
-        ->select('m.*, c.name as nama_kategori')
-        ->join('categories c', 'c.id = m.category_id', 'left')
-        ->where('m.status', 'available');
-    if ($katId) {
-        $builder->where('m.category_id', $katId);
+    public function menus()
+    {
+        $katId = $this->request->getGet('kategori');
+        $builder = $this->db->table('menus m')
+            ->select('m.*, c.name as nama_kategori, c.description as kategori_desc')
+            ->join('categories c', 'c.id = m.category_id', 'left')
+            ->where('m.status', 'available');
+        if ($katId) {
+            $builder->where('m.category_id', $katId);
+        }
+        $menus = $builder->get()->getResultArray();
+        $menus = $this->hitungStockMenu($menus);
+        return $this->response->setJSON($menus);
     }
-    return $this->response->setJSON($builder->get()->getResultArray());
-}
 }
