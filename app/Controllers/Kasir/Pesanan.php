@@ -131,19 +131,45 @@ class Pesanan extends BaseController
         ]);
         $orderId = $this->db->insertID();
 
-        foreach ($items as $item) {
-            $menu = $this->db->table('menus')->where('id', $item['id'])->get()->getRow();
-            if (!$menu) continue;
+        // Validasi stok semua item dulu sebelum insert
+foreach ($items as $item) {
+    $menu = $this->db->table('menus')->where('id', $item['id'])->get()->getRow();
+    if (!$menu) continue;
 
-            $this->db->table('order_items')->insert([
-                'order_id'   => $orderId,
-                'menu_id'    => $item['id'],
-                'qty'        => $item['qty'],
-                'unit_price' => $menu->price,
-                'notes'      => $item['catatan'] ?? '',
-                'status'     => 'pending',
-            ]);
+    // Hitung stok dari resep
+    $recipes = $this->db->table('recipes r')
+        ->select('r.qty_needed, i.stock_qty, i.name as bahan')
+        ->join('ingredients i', 'i.id = r.ingredient_id', 'left')
+        ->where('r.menu_id', $item['id'])
+        ->get()->getResultArray();
+
+    foreach ($recipes as $r) {
+        $qtyNeeded = (float)$r['qty_needed'];
+        if ($qtyNeeded <= 0) continue;
+        $stokTersedia = (int)floor((float)$r['stock_qty'] / $qtyNeeded);
+        if ($item['qty'] > $stokTersedia) {
+            // Rollback order yang sudah dibuat
+            $this->db->table('orders')->where('id', $orderId)->delete();
+            return redirect()->back()
+                ->with('error', 'Stok "' . $menu->name . '" tidak cukup. Stok saat ini hanya ' . $stokTersedia . ' pcs.');
         }
+    }
+}
+
+// Kalau semua lolos validasi, baru insert
+foreach ($items as $item) {
+    $menu = $this->db->table('menus')->where('id', $item['id'])->get()->getRow();
+    if (!$menu) continue;
+
+    $this->db->table('order_items')->insert([
+        'order_id'   => $orderId,
+        'menu_id'    => $item['id'],
+        'qty'        => $item['qty'],
+        'unit_price' => $menu->price,
+        'notes'      => $item['catatan'] ?? '',
+        'status'     => 'pending',
+    ]);
+}
 
         if ($tableId) {
             $this->db->table('tables')->where('id', $tableId)->update([

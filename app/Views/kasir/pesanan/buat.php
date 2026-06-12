@@ -1,18 +1,7 @@
 <?= $this->include('kasir/layouts/header') ?>
 
 <?php
-/**
- * ── KATEGORI STYLE MAP ──────────────────────────────────────────────
- * Icon & warna per kategori. Kunci = nama kategori (lowercase, trim).
- * Fallback ke 'default' jika nama tidak cocok.
- *
- * Cara kerja: icon & warna disimpan di sini (PHP), bukan di DB.
- * Admin bisa "pilih icon" lewat form kategori — nilainya disimpan
- * di kolom description dengan prefix [icon:X] [color:Y], lalu
- * di-parse di bawah. Jika tidak ada prefix, pakai keyword-matching.
- */
 $categoryStyles = [
-    // keyword matching (nama mengandung kata ini)
     'kopi'      => ['icon' => '☕', 'gradient' => 'linear-gradient(135deg,#6f4e37 0%,#c8a97a 100%)', 'badge' => '#6f4e37'],
     'coffee'    => ['icon' => '☕', 'gradient' => 'linear-gradient(135deg,#6f4e37 0%,#c8a97a 100%)', 'badge' => '#6f4e37'],
     'teh'       => ['icon' => '🍵', 'gradient' => 'linear-gradient(135deg,#2e7d32 0%,#a5d6a7 100%)', 'badge' => '#2e7d32'],
@@ -34,49 +23,38 @@ $categoryStyles = [
     'default'   => ['icon' => '🍴', 'gradient' => 'linear-gradient(135deg,#37474f 0%,#b0bec5 100%)', 'badge' => '#37474f'],
 ];
 
-/**
- * Fungsi parse icon dari description field.
- * Format: [icon:☕] atau [color:#6f4e37] di awal/akhir description.
- * Admin bisa set ini lewat form tambah/edit kategori.
- */
-function parseKategoriMeta(string $desc): array {
-    $icon  = null;
-    $color = null;
-    if (preg_match('/\[icon:([^\]]+)\]/', $desc, $m)) $icon  = trim($m[1]);
-    if (preg_match('/\[color:([^\]]+)\]/', $desc, $m)) $color = trim($m[1]);
-    return compact('icon', 'color');
+if (!function_exists('parseKategoriMeta')) {
+    function parseKategoriMeta(string $desc): array {
+        $icon  = null;
+        $color = null;
+        if (preg_match('/\[icon:([^\]]+)\]/', $desc, $m)) $icon  = trim($m[1]);
+        if (preg_match('/\[color:([^\]]+)\]/', $desc, $m)) $color = trim($m[1]);
+        return compact('icon', 'color');
+    }
 }
 
-/**
- * Ambil style untuk satu kategori.
- * Priority: 1) meta di description, 2) keyword-match, 3) default
- */
-function getKategoriStyle(string $namaKategori, string $descKategori, array $styleMap): array {
-    $meta = parseKategoriMeta($descKategori);
-
-    // Jika admin set manual via description
-    if ($meta['icon'] || $meta['color']) {
-        $base = $styleMap['default'];
-        if ($meta['icon'])  $base['icon']  = $meta['icon'];
-        if ($meta['color']) {
-            $c = $meta['color'];
-            $base['gradient'] = "linear-gradient(135deg,{$c} 0%,#f5f5f5 100%)";
-            $base['badge'] = $c;
+if (!function_exists('getKategoriStyle')) {
+    function getKategoriStyle(string $namaKategori, string $descKategori, array $styleMap): array {
+        $meta = parseKategoriMeta($descKategori);
+        if ($meta['icon'] || $meta['color']) {
+            $base = $styleMap['default'];
+            if ($meta['icon'])  $base['icon']  = $meta['icon'];
+            if ($meta['color']) {
+                $c = $meta['color'];
+                $base['gradient'] = "linear-gradient(135deg,{$c} 0%,#f5f5f5 100%)";
+                $base['badge'] = $c;
+            }
+            return $base;
         }
-        return $base;
+        $lower = mb_strtolower(trim($namaKategori));
+        foreach ($styleMap as $keyword => $style) {
+            if ($keyword === 'default') continue;
+            if (str_contains($lower, $keyword)) return $style;
+        }
+        return $styleMap['default'];
     }
-
-    // Keyword match (nama kategori)
-    $lower = mb_strtolower(trim($namaKategori));
-    foreach ($styleMap as $keyword => $style) {
-        if ($keyword === 'default') continue;
-        if (str_contains($lower, $keyword)) return $style;
-    }
-
-    return $styleMap['default'];
 }
 
-// Pre-build style map untuk semua kategori yang ada
 $katStyleMap = [];
 foreach ($kategoris as $k) {
     $katStyleMap[$k['id']] = getKategoriStyle(
@@ -85,7 +63,6 @@ foreach ($kategoris as $k) {
         $categoryStyles
     );
 }
-// Untuk menu tanpa kategori
 $katStyleMap[0] = $categoryStyles['default'];
 ?>
 
@@ -96,38 +73,19 @@ $katStyleMap[0] = $categoryStyles['default'];
     border-radius: 12px !important;
     overflow: hidden;
 }
-
 .menu-card:hover:not(.unavailable) {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, .15) !important;
 }
-
 .menu-card.unavailable {
     cursor: default;
     opacity: .55;
     filter: grayscale(0.4);
 }
-
-.menu-card .card-header-cat {
-    height: 6px;
-}
-
-.menu-card .cat-icon {
-    font-size: 22px;
-    line-height: 1;
-}
-
-.stock-badge {
-    font-size: 10px;
-    border-radius: 20px;
-    padding: 2px 7px;
-}
-
-.order-items-scroll {
-    max-height: 280px;
-    overflow-y: auto;
-}
-
+.menu-card .card-header-cat { height: 6px; }
+.menu-card .cat-icon { font-size: 22px; line-height: 1; }
+.stock-badge { font-size: 10px; border-radius: 20px; padding: 2px 7px; }
+.order-items-scroll { max-height: 280px; overflow-y: auto; }
 .order-item-row {
     display: flex;
     justify-content: space-between;
@@ -164,16 +122,19 @@ $katStyleMap[0] = $categoryStyles['default'];
             </div>
             <?php else: ?>
             <?php foreach ($menus as $m):
-                $katId = $m['category_id'] ?? 0;
-                $ks = $katStyleMap[$katId] ?? $categoryStyles['default'];
-                $stockMenu = $m['stock_menu']; // null = no recipe, int = calculated
+                $katId      = $m['category_id'] ?? 0;
+                $ks         = $katStyleMap[$katId] ?? $categoryStyles['default'];
+                $stockMenu  = $m['stock_menu'];
                 $isOutOfStock = ($stockMenu !== null && $stockMenu <= 0);
-                $isUnavail = ($m['status'] != 'available') || $isOutOfStock;
+                $isUnavail  = ($m['status'] != 'available') || $isOutOfStock;
+                $stokParam  = ($stockMenu !== null) ? (int)$stockMenu : 'null';
+                $namaEsc    = addslashes($m['name']);
             ?>
             <div class="col-sm-6 col-md-4">
                 <div class="card border-0 shadow-sm menu-card h-100 <?= $isUnavail ? 'unavailable' : '' ?>"
-                    <?= !$isUnavail ? "onclick=\"tambahItem({$m['id']}, '" . addslashes($m['name']) . "', {$m['price']})\"" : '' ?>>
-                    <!-- strip warna kategori di atas card -->
+                    <?php if (!$isUnavail): ?>
+                    onclick="tambahItem(<?= $m['id'] ?>, '<?= $namaEsc ?>', <?= $m['price'] ?>, <?= $stokParam ?>)"
+                    <?php endif; ?>>
                     <div class="card-header-cat" style="background:<?= $ks['gradient'] ?>"></div>
                     <div class="card-body pt-2 pb-2">
                         <div class="d-flex justify-content-between align-items-start mb-1">
@@ -183,15 +144,13 @@ $katStyleMap[0] = $categoryStyles['default'];
                                     <h6 class="card-title mb-0 fw-semibold" style="font-size:13px;line-height:1.2">
                                         <?= esc($m['name']) ?></h6>
                                     <?php if ($stockMenu !== null): ?>
-                                    <?php if ($stockMenu <= 0): ?>
-                                    <span class="stock-badge" style="background:#fee2e2;color:#dc2626">Stok habis</span>
-                                    <?php elseif ($stockMenu <= 3): ?>
-                                    <span class="stock-badge" style="background:#fef3c7;color:#d97706">Sisa
-                                        <?= $stockMenu ?> pcs</span>
-                                    <?php else: ?>
-                                    <span class="stock-badge" style="background:#d1fae5;color:#065f46">Stok
-                                        <?= $stockMenu ?></span>
-                                    <?php endif; ?>
+                                        <?php if ($stockMenu <= 0): ?>
+                                        <span class="stock-badge" style="background:#fee2e2;color:#dc2626">Stok habis</span>
+                                        <?php elseif ($stockMenu <= 3): ?>
+                                        <span class="stock-badge" style="background:#fef3c7;color:#d97706">Sisa <?= $stockMenu ?> pcs</span>
+                                        <?php else: ?>
+                                        <span class="stock-badge" style="background:#d1fae5;color:#065f46">Stok <?= $stockMenu ?></span>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                     <span class="stock-badge" style="background:#e0f2fe;color:#0369a1">Tersedia</span>
                                     <?php endif; ?>
@@ -237,12 +196,10 @@ $katStyleMap[0] = $categoryStyles['default'];
                             <label class="form-check-label small" for="tipeTakeaway">🥡 Takeaway</label>
                         </div>
                     </div>
-
                     <div id="boxMeja">
                         <input type="text" class="form-control form-control-sm" id="pilihMeja"
                             placeholder="Contoh: Meja 1, Meja 2...">
                     </div>
-
                     <div id="boxTakeaway" style="display:none">
                         <input type="text" class="form-control form-control-sm" id="catatanOrder"
                             placeholder="Nama pelanggan / No. HP...">
@@ -289,18 +246,15 @@ $katStyleMap[0] = $categoryStyles['default'];
 
 <script>
 const allMenus = <?= json_encode($menus, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
-
-// Category styles dari PHP — dipakai renderMenus JS
 const katStyles = <?= json_encode($katStyleMap, JSON_UNESCAPED_UNICODE) ?>;
 
 let recommendationRules = [];
 let orderItems = [];
 let aktivKategori = 0;
 
-// ── Render menu card (dipakai saat filter via AJAX) ────────────
 function renderMenuCard(m) {
     const ks = katStyles[m.category_id] || katStyles[0];
-    const stockMenu = m.stock_menu; // null or int
+    const stockMenu = m.stock_menu;
     const isOutOfStock = (stockMenu !== null && parseInt(stockMenu) <= 0);
     const unavail = m.status != 'available' || isOutOfStock;
 
@@ -316,9 +270,10 @@ function renderMenuCard(m) {
     }
 
     const nama = m.name.replace(/'/g, "\\'");
+    const stokParam = (stockMenu !== null && stockMenu !== undefined) ? stockMenu : 'null';
     return `<div class="col-sm-6 col-md-4">
         <div class="card border-0 shadow-sm menu-card h-100 ${unavail ? 'unavailable' : ''}"
-             ${!unavail ? `onclick="tambahItem(${m.id}, '${nama}', ${m.price})"` : ''}>
+             ${!unavail ? `onclick="tambahItem(${m.id}, '${nama}', ${m.price}, ${stokParam})"` : ''}>
             <div class="card-header-cat" style="background:${ks.gradient}"></div>
             <div class="card-body pt-2 pb-2">
                 <div class="d-flex justify-content-between align-items-start mb-1">
@@ -352,8 +307,7 @@ function filterKategori(katId) {
         .then(menus => {
             const container = document.getElementById('menuGrid');
             if (menus.length === 0) {
-                container.innerHTML =
-                    '<div class="col-12"><div class="alert alert-info">Tidak ada menu tersedia.</div></div>';
+                container.innerHTML = '<div class="col-12"><div class="alert alert-info">Tidak ada menu tersedia.</div></div>';
                 return;
             }
             container.innerHTML = menus.map(renderMenuCard).join('');
@@ -362,25 +316,26 @@ function filterKategori(katId) {
 
 fetch("/ml/recomendation.json")
     .then(res => res.json())
-    .then(data => {
-        recommendationRules = data;
-    })
-    .catch(err => {
-        console.log("Rekomendasi tidak tersedia:", err);
-    });
+    .then(data => { recommendationRules = data; })
+    .catch(err => { console.log("Rekomendasi tidak tersedia:", err); });
 
-function tambahItem(id, nama, harga) {
+function tambahItem(id, nama, harga, stokMenu) {
     const existing = orderItems.find(i => i.id === id);
+    const stok = (stokMenu !== null && stokMenu !== undefined && stokMenu !== 'null')
+                 ? parseInt(stokMenu) : null;
+
     if (existing) {
+        if (stok !== null && existing.qty >= stok) {
+            alert('Stok "' + nama + '" saat ini hanya ' + stok + ' pcs, tidak bisa melebihi stok yang tersedia.');
+            return;
+        }
         existing.qty++;
     } else {
-        orderItems.push({
-            id,
-            nama,
-            harga,
-            qty: 1,
-            catatan: ''
-        });
+        if (stok !== null && stok <= 0) {
+            alert('Stok "' + nama + '" sudah habis.');
+            return;
+        }
+        orderItems.push({ id, nama, harga, qty: 1, catatan: '', stokMenu: stok });
     }
     renderOrder();
     getRecommendations();
@@ -417,22 +372,15 @@ function getRecommendations() {
         if (match) {
             rule.consequents.forEach(item => {
                 if (!cartNames.some(c => c.trim().toLowerCase() === item.trim().toLowerCase())) {
-                    recommendations.push({
-                        item,
-                        confidence: rule.confidence
-                    });
+                    recommendations.push({ item, confidence: rule.confidence });
                 }
             });
         }
     });
     recommendations.sort((a, b) => b.confidence - a.confidence);
-    let result = [],
-        seen = new Set();
+    let result = [], seen = new Set();
     for (let r of recommendations) {
-        if (!seen.has(r.item)) {
-            seen.add(r.item);
-            result.push(r);
-        }
+        if (!seen.has(r.item)) { seen.add(r.item); result.push(r); }
         if (result.length === 3) break;
     }
     renderRecommendations(result);
@@ -448,8 +396,9 @@ function renderRecommendations(data) {
     data.forEach(r => {
         const menu = allMenus.find(m => m.name.trim().toLowerCase() === r.item.trim().toLowerCase());
         if (!menu) return;
+        const stokParam = (menu.stock_menu !== null && menu.stock_menu !== undefined) ? menu.stock_menu : 'null';
         html += `<button type="button" class="btn btn-sm btn-warning"
-            onclick="tambahItem(${menu.id},'${menu.name.replace(/'/g,"\\'")}',${menu.price})">
+            onclick="tambahItem(${menu.id},'${menu.name.replace(/'/g,"\\'")}',${menu.price},${stokParam})">
             + ${menu.name}</button>`;
     });
     html += `</div>`;
@@ -459,21 +408,18 @@ function renderRecommendations(data) {
 function renderOrder() {
     const container = document.getElementById('orderItems');
     if (orderItems.length === 0) {
-        container.innerHTML =
-            '<p class="text-muted small text-center py-3"><i class="bi bi-cart-x fs-4 d-block mb-1"></i>Belum ada item dipilih</p>';
+        container.innerHTML = '<p class="text-muted small text-center py-3"><i class="bi bi-cart-x fs-4 d-block mb-1"></i>Belum ada item dipilih</p>';
         document.getElementById('subtotalText').textContent = 'Rp 0';
         document.getElementById('itemCountText').textContent = '0 item';
-        document.getElementById('recommendationBox').innerHTML =
-            `<small class="text-muted">Pilih menu terlebih dahulu</small>`;
+        document.getElementById('recommendationBox').innerHTML = `<small class="text-muted">Pilih menu terlebih dahulu</small>`;
         return;
     }
-    let html = '',
-        subtotal = 0,
-        totalItem = 0;
+    let html = '', subtotal = 0, totalItem = 0;
     orderItems.forEach(item => {
         const sub = item.harga * item.qty;
         subtotal += sub;
         totalItem += item.qty;
+        const stokParam = (item.stokMenu !== null && item.stokMenu !== undefined) ? item.stokMenu : 'null';
         html += `<div class="order-item-row">
             <div style="flex:1">
                 <div class="fw-semibold" style="font-size:13px">${item.nama}</div>
@@ -485,7 +431,7 @@ function renderOrder() {
             <div class="d-flex align-items-center gap-1 ms-2">
                 <button class="btn btn-sm btn-outline-secondary px-2 py-0" onclick="kurangiItem(${item.id})">-</button>
                 <span class="fw-bold">${item.qty}</span>
-                <button class="btn btn-sm btn-outline-success px-2 py-0" onclick="tambahItem(${item.id},'${item.nama.replace(/'/g,"\\'")}',${item.harga})">+</button>
+                <button class="btn btn-sm btn-outline-success px-2 py-0" onclick="tambahItem(${item.id},'${item.nama.replace(/'/g,"\\'")}',${item.harga},${stokParam})">+</button>
                 <button class="btn btn-sm btn-outline-danger px-2 py-0 ms-1" onclick="hapusItem(${item.id})"><i class="bi bi-x"></i></button>
             </div>
         </div>
